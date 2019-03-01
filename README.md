@@ -26,3 +26,5 @@ See also
 [transcription](https://github.com/Nino-cunei/uruk/blob/master/docs/transcription.md).
 
 ![shot](images/shot.png)
+
+![jup](images/jup.png)
