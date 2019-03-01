@@ -127,13 +127,13 @@ class TfApp(Atf):
               warning=False
           )
           theLineart = f' {theLineart}'
-      result = (f'{rep}{nodeRep}{theLineart}') if theLineart else f'{rep}{nodeRep}'
+      result += (f'{rep}{nodeRep}{theLineart}') if theLineart else f'{rep}{nodeRep}'
     elif nType == 'comment':
       rep = mdEsc(htmlEsc(F.type.v(n)))
       rep = hlRep(app, rep, n, d.highlights)
       if isLinked:
         rep = app.webLink(n, text=rep, _asString=True)
-      result = f'{rep}{nodeRep}: {mdEsc(htmlEsc(F.text.v(n)))}'
+      result += f'{rep}{nodeRep}: {mdEsc(htmlEsc(F.text.v(n)))}'
     else:
       lineNumbersCondition = d.lineNumbers
       if nType == 'line' or nType == 'case':
@@ -154,7 +154,7 @@ class TfApp(Atf):
       elif nType == 'tablet':
         rep = mdEsc(htmlEsc(f'{nType} {F.catalogId.v(n)}')) if secLabel else ''
       rep = hlRep(app, rep, n, d.highlights)
-      result = app._addLink(
+      result += app._addLink(
           n,
           rep,
           nodeRep,

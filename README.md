@@ -1,4 +1,4 @@
-![logo](tutorial/images/ninologo.png)
+![logo](code/static/logo.png)
 
 # Uruk
 
@@ -8,7 +8,7 @@ for working with the
 [Uruk](https://github.com/Nino-cunei/uruk) corpus: Proto Cuneiform Tablets from the Uruk IV/III period.
 
 Get started with the
-[tutorial](https://nbviewer.jupyter.org/github/annotation/app-uruk/blob/master/tutorial/start.ipynb).
+[tutorial](https://nbviewer.jupyter.org/github/annotation/tutorials/blob/master/uruk/start.ipynb).
 
 It offers this [API](https://annotation.github.io/text-fabric/Api/App/).
 
@@ -22,5 +22,7 @@ photos and lineart.
 
 See also
 [about](https://github.com/Nino-cunei/uruk/blob/master/docs/about.md),
-[images](https://github.com/Nino-cuneininogh/uruk/blob/master/docs/images.md),
-[transcription](https://github.com/Nino-cuneininogh/uruk/blob/master/docs/transcription.md).
+[images](https://github.com/Nino-cunei/uruk/blob/master/docs/images.md),
+[transcription](https://github.com/Nino-cunei/uruk/blob/master/docs/transcription.md).
+
+![shot](images/shot.png)
