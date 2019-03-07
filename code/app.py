@@ -1,6 +1,6 @@
 import os
 
-from tf.core.helpers import htmlEsc, mdEsc
+from tf.core.helpers import mdhtmlEsc, htmlEsc, mdEsc
 from tf.applib.helpers import dh
 from tf.applib.display import prettyPre, getFeatures
 from tf.applib.highlight import hlRep
@@ -129,11 +129,11 @@ class TfApp(Atf):
           theLineart = f' {theLineart}'
       result += (f'{rep}{nodeRep}{theLineart}') if theLineart else f'{rep}{nodeRep}'
     elif nType == 'comment':
-      rep = mdEsc(htmlEsc(F.type.v(n)))
+      rep = mdhtmlEsc(F.type.v(n))
       rep = hlRep(app, rep, n, d.highlights)
       if isLinked:
         rep = app.webLink(n, text=rep, _asString=True)
-      result += f'{rep}{nodeRep}: {mdEsc(htmlEsc(F.text.v(n)))}'
+      result += f'{rep}{nodeRep}: {mdhtmlEsc(F.text.v(n))}'
     else:
       lineNumbersCondition = d.lineNumbers
       if nType == 'line' or nType == 'case':
@@ -141,18 +141,18 @@ class TfApp(Atf):
         rep = (
             src
             if src else (
-                mdEsc(htmlEsc(f'{nType} {F.number.v(n)}'))
+                mdhtmlEsc(f'{nType} {F.number.v(n)}')
                 if secLabel or nType == 'case' else
                 ''
             )
         )
         lineNumbersCondition = d.lineNumbers and F.terminal.v(n)
       elif nType == 'column':
-        rep = mdEsc(htmlEsc(f'{nType} {F.number.v(n)}')) if secLabel else ''
+        rep = mdhtmlEsc(f'{nType} {F.number.v(n)}') if secLabel else ''
       elif nType == 'face':
-        rep = mdEsc(htmlEsc(f'{nType} {F.type.v(n)}'))
+        rep = mdhtmlEsc(f'{nType} {F.type.v(n)}')
       elif nType == 'tablet':
-        rep = mdEsc(htmlEsc(f'{nType} {F.catalogId.v(n)}')) if secLabel else ''
+        rep = mdhtmlEsc(f'{nType} {F.catalogId.v(n)}') if secLabel else ''
       rep = hlRep(app, rep, n, d.highlights)
       result += app._addLink(
           n,
@@ -215,6 +215,7 @@ class TfApp(Atf):
     E = api.E
     sortNodes = api.sortNodes
     otypeRank = api.otypeRank
+    # isHtml = options.get('fmt', None) in app.textFormats
 
     bigType = False
     if d.condenseType is not None and otypeRank[nType] > otypeRank[d.condenseType]:
