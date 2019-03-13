@@ -105,7 +105,7 @@ class TfApp(Atf):
     if _asApp:
       nodeRep = f' <a href="#" class="nd">{n}</a> ' if d.withNodes else ''
     else:
-      nodeRep = f' *{n}* ' if d.withNodes else ''
+      nodeRep = f' <i>{n}</i> ' if d.withNodes else ''
 
     if nType in ATF_TYPES:
       isSign = nType == 'sign'
