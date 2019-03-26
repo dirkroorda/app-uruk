@@ -9,7 +9,6 @@ from tf.applib.links import outLink
 from atf import Atf
 from image import wrapLink, URL_FORMAT, imageClass, getImages, getImagery
 
-TEMP_DIR = '_temp'
 REPORT_DIR = 'reports'
 
 COMMENT_TYPES = set('''
@@ -40,7 +39,6 @@ class TfApp(Atf):
 
     getImagery(app, lgc, check, silent)
 
-    app.tempDir = f'{app.repoLocation}/{TEMP_DIR}'
     app.reportDir = f'{app.repoLocation}/{REPORT_DIR}'
 
     if not _asApp:
