@@ -6,7 +6,7 @@ from shutil import copyfile
 from tf.core.helpers import console
 from tf.applib.helpers import dh
 from tf.applib.links import outLink
-from tf.applib.data import getData
+from tf.applib.repo import checkoutRepo
 from atf import OUTER_QUAD_TYPES
 
 LOCAL_IMAGE_DIR = 'cdli-imagery'
@@ -221,14 +221,13 @@ def _useImage(app, image, kind, key, node):
   return f'{base}{LOCAL_IMAGE_DIR}/{localImageName}'
 
 
-def getImagery(app, lgc, check, silent):
-  (imageRelease, imageBase) = getData(
-      app.org,
-      app.repo,
-      app.relativeImages,
-      '',
-      lgc,
-      check,
+def getImagery(app, silent):
+  (imageRelease, imageCommit, imageLocal, imageBase, imageDir) = checkoutRepo(
+      org=app.org,
+      repo=app.repo,
+      folder=app.relativeImages,
+      version='',
+      checkout='',
       withPaths=True,
       keep=True,
       silent=silent,

@@ -34,10 +34,10 @@ ATF_TYPES = set('''
 
 class TfApp(Atf):
 
-  def __init__(app, *args, _asApp=False, lgc=False, check=False, silent=False, **kwargs):
-    setupApi(app, *args, _asApp=_asApp, lgc=lgc, check=check, silent=silent, **kwargs)
+  def __init__(app, *args, _asApp=False, silent=False, **kwargs):
+    setupApi(app, *args, _asApp=_asApp, silent=silent, **kwargs)
 
-    getImagery(app, lgc, check, silent)
+    getImagery(app, silent)
 
     app.reportDir = f'{app.repoLocation}/{REPORT_DIR}'
 
