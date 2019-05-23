@@ -4,10 +4,9 @@ from tf.core.helpers import mdhtmlEsc, htmlEsc, mdEsc
 from tf.applib.helpers import dh
 from tf.applib.display import prettyPre, getFeatures
 from tf.applib.highlight import hlRep
+from tf.applib.app import loadModule
 from tf.applib.api import setupApi
 from tf.applib.links import outLink
-from atf import Atf
-from image import wrapLink, URL_FORMAT, imageClass, getImages, getImagery
 
 REPORT_DIR = 'reports'
 
@@ -32,12 +31,15 @@ ATF_TYPES = set('''
 '''.strip().split())
 
 
-class TfApp(Atf):
+class TfApp(object):
 
   def __init__(app, *args, _asApp=False, silent=False, **kwargs):
+    atf = loadModule(*args[0:2], 'atf')
+    atf.atfApi(app)
+    app.image = loadModule(*args[0:2], 'image')
     setupApi(app, *args, _asApp=_asApp, silent=silent, **kwargs)
 
-    getImagery(app, silent)
+    app.image.getImagery(app, silent)
 
     app.reportDir = f'{app.repoLocation}/{REPORT_DIR}'
 
@@ -57,7 +59,7 @@ class TfApp(Atf):
 
     title = None if _noUrl else ('to CDLI main page for this tablet')
     linkText = pNum if text is None else text
-    url = '#' if _noUrl else URL_FORMAT['tablet']['main'].format(pNum)
+    url = '#' if _noUrl else app.image.URL_FORMAT['tablet']['main'].format(pNum)
     target = '' if _noUrl else None
 
     result = outLink(
@@ -73,10 +75,10 @@ class TfApp(Atf):
     dh(result)
 
   def cdli(app, n, linkText=None, asString=False):
-    (nType, objectType, identifier) = imageClass(app, n)
+    (nType, objectType, identifier) = app.image.imageClass(app, n)
     if linkText is None:
       linkText = identifier
-    result = wrapLink(linkText, objectType, 'main', identifier)
+    result = app.image.wrapLink(linkText, objectType, 'main', identifier)
     if asString:
       return result
     else:
@@ -119,7 +121,7 @@ class TfApp(Atf):
         if isSign or isQuad:
           width = '2em' if isSign else '4em'
           height = '4em' if isSign else '6em'
-          theLineart = getImages(
+          theLineart = app.image.getImages(
               app,
               n, kind='lineart', width=width, height=height, _asString=True, withCaption=False,
               warning=False
@@ -354,7 +356,7 @@ class TfApp(Atf):
         if isOuter:
           width = '2em' if isSign else '4em'
           height = '4em' if isSign else '6em'
-          theLineart = getImages(
+          theLineart = app.image.getImages(
               app,
               n, kind='lineart', width=width, height=height, _asString=True, withCaption=False,
               warning=False
@@ -408,13 +410,13 @@ class TfApp(Atf):
 ''')
 
   def lineart(app, ns, key=None, asLink=False, withCaption=None, **options):
-    return getImages(
+    return app.image.getImages(
         app,
         ns, kind='lineart', key=key, asLink=asLink, withCaption=withCaption, **options
     )
 
   def photo(app, ns, key=None, asLink=False, withCaption=None, **options):
-    return getImages(
+    return app.image.getImages(
         app,
         ns, kind='photo', key=key, asLink=asLink, withCaption=withCaption, **options
     )

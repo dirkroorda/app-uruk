@@ -7,7 +7,6 @@ from tf.core.helpers import console
 from tf.applib.helpers import dh
 from tf.applib.links import outLink
 from tf.applib.repo import checkoutRepo
-from atf import OUTER_QUAD_TYPES
 
 LOCAL_IMAGE_DIR = 'cdli-imagery'
 
@@ -99,7 +98,7 @@ def imageClass(app, n):
         nType = 'sign/quad'
   else:
     nType = F.otype.v(n)
-    if nType in OUTER_QUAD_TYPES:
+    if nType in app.outerQuadTypes:
       identifier = app.atfFromOuterQuad(n)
       objectType = 'ideograph'
     elif nType == 'tablet':
@@ -198,7 +197,7 @@ def _useImage(app, image, kind, key, node):
     nType = F.otype.v(node)
     if nType == 'tablet':
       nodeRep = F.catalogId.v(node)
-    elif nType in OUTER_QUAD_TYPES:
+    elif nType in app.outerQuadTypes:
       nodeRep = app.atfFromOuterQuad(node)
     else:
       nodeRep = str(node)
