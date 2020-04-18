@@ -1,34 +1,41 @@
-import os
-
-from tf.core.helpers import mdhtmlEsc, htmlEsc, mdEsc
 from tf.applib.helpers import dh
-from tf.applib.display import prettyPre, getFeatures
-from tf.applib.highlight import hlRep
 from tf.applib.app import loadModule
 from tf.applib.api import setupApi
 from tf.applib.links import outLink
 
-REPORT_DIR = "reports"
 
-COMMENT_TYPES = set(
-    """
-    tablet
-    face
-    column
-    line
-    case
-""".strip().split()
-)
+def notice(app):
+    if int(app.api.TF.version.split(".")[0]) <= 7:
+        print(
+            f"""
+Your Text-Fabric is outdated.
+It cannot load this version of the TF app `{app.appName}`.
+Recommendation: upgrade Text-Fabric to version 8.
+Hint:
 
-CLUSTER_TYPES = dict(uncertain="?", properName="=", supplied="&gt;",)
+    pip3 install --upgrade text-fabric
 
-ATF_TYPES = set(
-    """
-    sign
-    quad
-    cluster
-""".strip().split()
-)
+"""
+        )
+
+
+def caseDir(app, n, nType, cls):
+    api = app.api
+    F = api.F
+
+    wrap = app.levels[nType]["wrap"]
+    flow = "col" if F.depth.v(n) & 1 else "row"
+    cls.update(dict(children=f"children {flow} {wrap}"))
+
+
+def clusterBoundaries(app, n, nType, cls):
+    lbl = cls.pop('label')
+    cls.update(dict(labelb=f"{lbl} {nType}b", labele=f"{lbl} {nType}e"))
+    cls['container'] += f" {nType}"
+
+
+def commentsCls(app, n, nType, cls):
+    cls['container'] += f" {nType}"
 
 
 class TfApp(object):
@@ -37,14 +44,29 @@ class TfApp(object):
         atf.atfApi(app)
         app.image = loadModule(*args[0:2], "image")
         setupApi(app, *args, _asApp=_asApp, silent=silent, **kwargs)
+        notice(args[0])
 
-        app.image.getImagery(app, silent)
+        app.image.getImagery(app, silent, checkout=kwargs.get("checkout", ""))
 
-        app.reportDir = f"{app.repoLocation}/{REPORT_DIR}"
+        api = app.api
+        F = api.F
+        E = api.E
 
-        if not _asApp:
-            for cdir in (app.tempDir, app.reportDir):
-                os.makedirs(cdir, exist_ok=True)
+        def getOp(ch):
+            result = ""
+            nextChildren = E.op.f(ch)
+            if nextChildren:
+                op = nextChildren[0][1]
+                result = f'<div class="op">{op}</div>'
+            return result
+
+        app.childrenCustom = dict(
+            line=((lambda x: not F.terminal.v(x)), E.sub.f, False),
+            case=((lambda x: not F.terminal.v(x)), E.sub.f, False),
+            quad=((lambda x: True), E.sub.f, False),
+        )
+        app.afterChild = dict(quad=getOp)
+        app.prettyCustom = dict(case=caseDir, cluster=clusterBoundaries, comments=commentsCls)
 
     def webLink(app, n, text=None, className=None, _asString=False, _noUrl=False):
         api = app.api
@@ -83,304 +105,33 @@ class TfApp(object):
         else:
             dh(result)
 
-    def _plain(
-        app, n, passage, isLinked, _asString, secLabel, **options,
-    ):
-        display = app.display
-        d = display.get(options)
+    # PRETTY HELPERS
 
-        _asApp = app._asApp
+    def getGraphics(app, n, nType, outer):
         api = app.api
         F = api.F
-
-        nType = F.otype.v(n)
-        result = passage
-        if _asApp:
-            nodeRep = f' <a href="#" class="nd">{n}</a> ' if d.withNodes else ""
-        else:
-            nodeRep = f" <i>{n}</i> " if d.withNodes else ""
-
-        if nType in ATF_TYPES:
-            isSign = nType == "sign"
-            isQuad = nType == "quad"
-            rep = (
-                app.atfFromSign(n)
-                if isSign
-                else app.atfFromQuad(n)
-                if isQuad
-                else app.atfFromCluster(n)
-            )
-            rep = hlRep(app, rep, n, d.highlights)
-            if isLinked:
-                rep = app.webLink(n, text=rep, _asString=True)
-            theLineart = ""
-            if d.lineart:
-                if isSign or isQuad:
-                    width = "2em" if isSign else "4em"
-                    height = "4em" if isSign else "6em"
-                    theLineart = app.image.getImages(
-                        app,
-                        n,
-                        kind="lineart",
-                        width=width,
-                        height=height,
-                        _asString=True,
-                        withCaption=False,
-                        warning=False,
-                    )
-                    theLineart = f" {theLineart}"
-            result += (
-                (f"{rep}{nodeRep}{theLineart}") if theLineart else f"{rep}{nodeRep}"
-            )
-        elif nType == "comment":
-            rep = mdhtmlEsc(F.type.v(n))
-            rep = hlRep(app, rep, n, d.highlights)
-            if isLinked:
-                rep = app.webLink(n, text=rep, _asString=True)
-            result += f"{rep}{nodeRep}: {mdhtmlEsc(F.text.v(n))}"
-        else:
-            lineNumbersCondition = d.lineNumbers
-            if nType == "line" or nType == "case":
-                src = F.srcLn.v(n) or ""
-                rep = (
-                    src
-                    if src
-                    else (
-                        mdhtmlEsc(f"{nType} {F.number.v(n)}")
-                        if secLabel or nType == "case"
-                        else ""
-                    )
-                )
-                lineNumbersCondition = d.lineNumbers and F.terminal.v(n)
-            elif nType == "column":
-                rep = mdhtmlEsc(f"{nType} {F.number.v(n)}") if secLabel else ""
-            elif nType == "face":
-                rep = mdhtmlEsc(f"{nType} {F.type.v(n)}")
-            elif nType == "tablet":
-                rep = mdhtmlEsc(f"{nType} {F.catalogId.v(n)}") if secLabel else ""
-            rep = hlRep(app, rep, n, d.highlights)
-            result += app._addLink(
-                n, rep, nodeRep, isLinked=isLinked, lineNumbers=lineNumbersCondition,
-            )
-
-        if _asString or _asApp:
-            return result
-        dh(result)
-
-    def _addLink(app, n, rep, nodeRep, isLinked=True, lineNumbers=True):
-        F = app.api.F
-        if isLinked:
-            rep = app.webLink(n, text=rep, _asString=True)
-        theLine = ""
-        if lineNumbers:
-            theLine = mdEsc(f" @{F.srcLnNum.v(n)} ")
-        return f"{rep}{nodeRep}{theLine}"
-
-    def _pretty(
-        app, n, outer, html, firstSlot, lastSlot, seen=set(), **options,
-    ):
-        display = app.display
-        d = display.get(options)
-
-        goOn = prettyPre(app, n, firstSlot, lastSlot, d)
-        if not goOn:
-            return
-        (
-            slotType,
-            nType,
-            isBigType,
-            className,
-            boundaryClass,
-            hlAtt,
-            nodePart,
-            myStart,
-            myEnd,
-        ) = goOn
-
-        api = app.api
-        F = api.F
-        L = api.L
         E = api.E
-        sortNodes = api.sortNodes
-        # isHtml = options.get('fmt', None) in app.textFormats
 
-        if outer:
-            seen = set()
+        result = ""
 
-        (hlClass, hlStyle) = hlAtt
-
-        heading = ""
-        featurePart = ""
-        commentsPart = (
-            app._getComments(n, firstSlot, lastSlot, seen, **options,)
-            if nType in COMMENT_TYPES
-            else ""
-        )
-        children = ()
-
-        if isBigType:
-            children = ()
-        elif nType == "tablet":
-            children = L.d(n, otype="face")
-        elif nType == "face":
-            children = L.d(n, otype="column")
-        elif nType == "column":
-            children = L.d(n, otype="line")
-        elif nType == "line" or nType == "case":
-            if F.terminal.v(n):
-                children = sortNodes(
-                    set(L.d(n, otype="cluster"))
-                    | set(L.d(n, otype="quad"))
-                    | set(L.d(n, otype="sign"))
-                )
-            else:
-                children = E.sub.f(n)
-        elif nType == "cluster":
-            children = sortNodes(
-                set(L.d(n, otype="cluster"))
-                | set(L.d(n, otype="quad"))
-                | set(L.d(n, otype="sign"))
+        isOuter = outer or (all(F.otype.v(parent) != "quad" for parent in E.sub.t(n)))
+        if isOuter:
+            width = "2em" if nType == "sign" else "4em"
+            height = "4em" if nType == "quad" else "6em"
+            theGraphics = app.image.getImages(
+                app,
+                n,
+                kind="lineart",
+                width=width,
+                height=height,
+                _asString=True,
+                withCaption=False,
+                warning=False,
             )
-        elif nType == "quad":
-            children = E.sub.f(n)
+            if theGraphics:
+                result = f"<div>{theGraphics}</div>"
 
-        if nType == "tablet":
-            heading = htmlEsc(F.catalogId.v(n))
-            heading += " "
-            heading += getFeatures(
-                app, n, ("name", "period", "excavation"), plain=True, **options,
-            )
-        elif nType == "face":
-            heading = htmlEsc(F.type.v(n))
-            featurePart = getFeatures(app, n, ("identifier", "fragment"), **options,)
-        elif nType == "column":
-            heading = htmlEsc(F.number.v(n))
-            if F.prime.v(n):
-                heading += "'"
-        elif nType == "line" or nType == "case":
-            heading = htmlEsc(F.number.v(n))
-            if F.prime.v(n):
-                heading += "'"
-            if F.terminal.v(n):
-                className = "trminal"
-                theseFeats = ("srcLnNum",) if d.lineNumbers else ()
-                featurePart = getFeatures(app, n, theseFeats, **options,)
-        elif nType == "comment":
-            heading = htmlEsc(F.type.v(n))
-            featurePart = getFeatures(app, n, ("text",), **options,)
-        elif nType == "cluster":
-            seen.add(n)
-            heading = htmlEsc(CLUSTER_TYPES.get(F.type.v(n), ""))
-        elif nType == "quad":
-            seen.add(n)
-        elif nType == slotType:
-            featurePart = app._getAtf(n) + getFeatures(app, n, (), **options)
-            seen.add(n)
-            if not outer and F.type.v(n) == "empty":
-                return
-
-        if outer:
-            typePart = app.webLink(n, text=f"{nType} {heading}", _asString=True)
-        else:
-            typePart = heading
-
-        isCluster = nType == "cluster"
-        extra = "b" if isCluster else ""
-        label = (
-            f"""
-    <div class="lbl {className}{extra}">
-        {typePart}
-        {nodePart}
-    </div>
-"""
-            if typePart or nodePart
-            else ""
-        )
-
-        if isCluster:
-            if outer:
-                html.append(f'<div class="contnr {className} {hlClass}" {hlStyle}>')
-            html.append(label)
-            if outer:
-                html.append(f'<div class="children {className}">')
-        else:
-            html.append(
-                f"""
-<div class="contnr {className} {hlClass}" {hlStyle}>
-    {label}
-    <div class="meta">
-        {featurePart}
-        {commentsPart}
-    </div>
-"""
-            )
-        if d.lineart:
-            isQuad = nType == "quad"
-            isSign = nType == "sign"
-            if isQuad or isSign:
-                isOuter = outer or (
-                    all(F.otype.v(parent) != "quad" for parent in E.sub.t(n))
-                )
-                if isOuter:
-                    width = "2em" if isSign else "4em"
-                    height = "4em" if isSign else "6em"
-                    theLineart = app.image.getImages(
-                        app,
-                        n,
-                        kind="lineart",
-                        width=width,
-                        height=height,
-                        _asString=True,
-                        withCaption=False,
-                        warning=False,
-                    )
-                    if theLineart:
-                        html.append(f"<div>{theLineart}</div>")
-        caseDir = ""
-        if not isCluster:
-            if children:
-                if nType == "case":
-                    depth = F.depth.v(n)
-                    caseDir = "v" if depth & 1 else "h"
-                html.append(
-                    f"""
-    <div class="children {className}{caseDir}">
-"""
-                )
-
-        for ch in children:
-            if ch not in seen:
-                app._pretty(
-                    ch, False, html, firstSlot, lastSlot, seen=seen, **options,
-                )
-                if nType == "quad":
-                    nextChildren = E.op.f(ch)
-                    if nextChildren:
-                        op = nextChildren[0][1]
-                        html.append(f'<div class="op">{op}</div>')
-        if isCluster:
-            html.append(
-                f"""
-    <div class="lbl {className}e {hlClass}" {hlStyle}>
-        {typePart}
-        {nodePart}
-    </div>
-"""
-            )
-            if outer:
-                html.append("</div></div>")
-        else:
-            if children:
-                html.append(
-                    """
-    </div>
-"""
-                )
-            html.append(
-                """
-</div>
-"""
-            )
+        return result
 
     def lineart(app, ns, key=None, asLink=False, withCaption=None, **options):
         return app.image.getImages(
@@ -406,36 +157,3 @@ class TfApp(object):
 
     def imagery(app, objectType, kind):
         return set(app._imagery.get(objectType, {}).get(kind, {}))
-
-    def _getComments(
-        app, n, firstSlot, lastSlot, seen, **options,
-    ):
-        display = app.display
-
-        api = app.api
-        E = api.E
-        cns = E.comments.f(n)
-        if len(cns):
-            html = ['<div class="comments">']
-            for c in cns:
-                app._pretty(
-                    c,
-                    False,
-                    html,
-                    firstSlot,
-                    lastSlot,
-                    condenseType=None,
-                    lineart=False,
-                    seen=seen,
-                    **display.consume(options, "lineart", "condenseType"),
-                )
-            html.append("</div>")
-            commentsPart = "".join(html)
-        else:
-            commentsPart = ""
-        return commentsPart
-
-    def _getAtf(app, n):
-        atf = app.atfFromSign(n, flags=True)
-        featurePart = f' <span class="srcln">{atf}</span>'
-        return featurePart

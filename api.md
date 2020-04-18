@@ -29,9 +29,9 @@ just say `asString=True`.
 All display functions (`plain()`, `pretty()`, `table()`, `show()` etc
 accept additional options:
 
-## lineart
+## graphics
 
-`lineart` indicates whether to display a lineart image in addition
+`graphics` indicates whether to display a piece of graphics with the node
 (only relevant for signs and quads)
 
 ## lineNumbers
