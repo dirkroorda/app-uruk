@@ -38,7 +38,8 @@ def atfApi(app):
     )
 
 
-def plainAtfType(app, nType, n, r, d, display, outer, done=set(), **options):
+def plainAtfType(app, d, g, r, n, outer, done=set()):
+    nType = r.nType
     isSign = nType == "sign"
     isQuad = nType == "quad"
     text = (

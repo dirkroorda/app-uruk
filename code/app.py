@@ -29,13 +29,13 @@ def caseDir(app, n, nType, cls):
 
 
 def clusterBoundaries(app, n, nType, cls):
-    lbl = cls.pop('label')
+    lbl = cls.pop("label")
     cls.update(dict(labelb=f"{lbl} {nType}b", labele=f"{lbl} {nType}e"))
-    cls['container'] += f" {nType}"
+    cls["container"] += f" {nType}"
 
 
 def commentsCls(app, n, nType, cls):
-    cls['container'] += f" {nType}"
+    cls["container"] += f" {nType}"
 
 
 class TfApp(object):
@@ -66,7 +66,9 @@ class TfApp(object):
             quad=((lambda x: True), E.sub.f, False),
         )
         app.afterChild = dict(quad=getOp)
-        app.prettyCustom = dict(case=caseDir, cluster=clusterBoundaries, comments=commentsCls)
+        app.prettyCustom = dict(
+            case=caseDir, cluster=clusterBoundaries, comments=commentsCls
+        )
 
     def webLink(app, n, text=None, className=None, _asString=False, _noUrl=False):
         api = app.api
