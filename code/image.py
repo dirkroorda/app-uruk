@@ -77,7 +77,7 @@ CAPTION_STYLE = dict(
 )
 
 
-def imageClass(app, n):
+def imageCls(app, n):
     api = app.api
     F = api.F
     if type(n) is str:
@@ -150,7 +150,7 @@ def getImages(
         withCaption = None if asLink else "bottom"
     for n in ns:
         caption = None
-        (nType, objectType, identifier) = imageClass(app, n)
+        (nType, objectType, identifier) = imageCls(app, n)
         if objectType:
             imageBase = app._imagery.get(objectType, {}).get(kind, {})
             images = imageBase.get(identifier, None)
@@ -220,12 +220,12 @@ def getImages(
 
 
 def _useImage(app, image, kind, key, node):
-    _asApp = app._asApp
+    _browse = app._browse
     api = app.api
     F = api.F
     (imageDir, imageName) = os.path.split(image)
     (base, ext) = os.path.splitext(imageName)
-    localBase = app.localDir if _asApp else app.curDir
+    localBase = app.localDir if _browse else app.curDir
     localDir = f"{localBase}/{LOCAL_IMAGE_DIR}"
     if not os.path.exists(localDir):
         os.makedirs(localDir, exist_ok=True)
@@ -255,7 +255,7 @@ def _useImage(app, image, kind, key, node):
         localImagePath
     ):
         copyfile(image, localImagePath)
-    base = "/local/" if _asApp else ""
+    base = "/local/" if _browse else ""
     return f"{base}{LOCAL_IMAGE_DIR}/{localImageName}"
 
 

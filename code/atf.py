@@ -31,11 +31,6 @@ def atfApi(app):
     app.nodeFromCase = types.MethodType(nodeFromCase, app)
     app.caseFromNode = types.MethodType(caseFromNode, app)
     app.casesByLevel = types.MethodType(casesByLevel, app)
-    app.plainCustom = dict(
-        sign=plainAtfType,
-        quad=plainAtfType,
-        cluster=plainAtfType,
-    )
 
 
 def plainAtfType(app, d, g, r, n, outer, done=set()):
@@ -90,13 +85,13 @@ def getSource(app, node, nodeType=None, lineNumbers=False):
     return sourceLines
 
 
-def atfFromSign(app, n, flags=False, display=None, outerClass="", done=set()):
+def atfFromSign(app, n, flags=False, display=None, outerCls="", done=set()):
     F = app.api.F
     Fs = app.api.Fs
 
     if F.otype.v(n) != "sign":
         result = "«no sign»"
-        return _deliver(app, n, result, display, outerClass)
+        return _deliver(app, n, result, display, outerCls)
 
     grapheme = F.grapheme.v(n)
     if grapheme == "…":
@@ -137,11 +132,11 @@ def atfFromSign(app, n, flags=False, display=None, outerClass="", done=set()):
                 else:
                     result += char
 
-    return _deliver(app, n, result, display, outerClass, done)
+    return _deliver(app, n, result, display, outerCls, done)
 
 
 def atfFromQuad(
-    app, n, flags=False, outer=True, display=None, outerClass="", done=set()
+    app, n, flags=False, outer=True, display=None, outerCls="", done=set()
 ):
     api = app.api
     E = api.E
@@ -150,12 +145,12 @@ def atfFromQuad(
 
     if F.otype.v(n) != "quad":
         result = "«no quad»"
-        return _deliver(app, n, result, display, outerClass)
+        return _deliver(app, n, result, display, outerCls)
 
     children = E.sub.f(n)
     if not children or len(children) < 2:
         result = f"«quad with less than two sub-quads»"
-        return _deliver(app, n, result, display, outerClass)
+        return _deliver(app, n, result, display, outerCls)
 
     result = ""
     for child in children:
@@ -172,12 +167,12 @@ def atfFromQuad(
                 flags=flags,
                 outer=False,
                 display=display,
-                outerClass=outerClass,
+                outerCls=outerCls,
                 done=done,
             )
             if childType == "quad"
             else app.atfFromSign(
-                child, flags=flags, display=display, outerClass=outerClass, done=done,
+                child, flags=flags, display=display, outerCls=outerCls, done=done,
             )
         )
         result += f"{thisResult}{op}"
@@ -218,16 +213,16 @@ def atfFromQuad(
             else:
                 result = f"({result})"
 
-    return _deliver(app, n, result, display, outerClass, done)
+    return _deliver(app, n, result, display, outerCls, done)
 
 
-def atfFromOuterQuad(app, n, flags=False, display=None, outerClass="", done=set()):
+def atfFromOuterQuad(app, n, flags=False, display=None, outerCls="", done=set()):
     api = app.api
     F = api.F
     nodeType = F.otype.v(n)
     if nodeType == "sign":
         result = app.atfFromSign(
-            n, flags=flags, display=display, outerClass=outerClass, done=done
+            n, flags=flags, display=display, outerCls=outerCls, done=done
         )
     elif nodeType == "quad":
         result = app.atfFromQuad(
@@ -235,23 +230,23 @@ def atfFromOuterQuad(app, n, flags=False, display=None, outerClass="", done=set(
             flags=flags,
             outer=True,
             display=display,
-            outerClass=outerClass,
+            outerCls=outerCls,
             done=done,
         )
     else:
         result = "«no outer quad»"
 
-    return _deliver(app, n, result, display, outerClass, done)
+    return _deliver(app, n, result, display, outerCls, done)
 
 
-def atfFromCluster(app, n, seen=None, display=None, outerClass="", done=set()):
+def atfFromCluster(app, n, seen=None, display=None, outerCls="", done=set()):
     api = app.api
     F = api.F
     E = api.E
 
     if F.otype.v(n) != "cluster":
         result = "«no cluster»"
-        return _deliver(app, n, result, display, outerClass)
+        return _deliver(app, n, result, display, outerCls)
 
     typ = F.type.v(n)
     (bOpen, bClose) = CLUSTER_BRACKETS[typ]
@@ -269,15 +264,15 @@ def atfFromCluster(app, n, seen=None, display=None, outerClass="", done=set()):
 
         thisResult = (
             app.atfFromCluster(
-                child, seen=seen, display=display, outerClass=outerClass, done=done,
+                child, seen=seen, display=display, outerCls=outerCls, done=done,
             )
             if childType == "cluster"
             else app.atfFromQuad(
-                child, flags=True, display=display, outerClass=outerClass, done=done,
+                child, flags=True, display=display, outerCls=outerCls, done=done,
             )
             if childType == "quad"
             else app.atfFromSign(
-                child, flags=True, display=display, outerClass=outerClass, done=done,
+                child, flags=True, display=display, outerCls=outerCls, done=done,
             )
             if childType == "sign"
             else None
@@ -288,16 +283,16 @@ def atfFromCluster(app, n, seen=None, display=None, outerClass="", done=set()):
         result.append(thisResult)
     result = f'{bOpen}{" ".join(result)}{bClose}'
 
-    return _deliver(app, n, result, display, outerClass, done)
+    return _deliver(app, n, result, display, outerCls, done)
 
 
-def _deliver(app, n, result, display, outerClass, done):
+def _deliver(app, n, result, display, outerCls, done):
     if display is None:
         return result
-    (hlClass, hlStyle) = getHlAtt(app, n, display.highlights, display.baseType, True)
-    classes = f"plain{outerClass} {hlClass}"
+    (hlCls, hlStyle) = getHlAtt(app, n, display.highlights, display.baseType, True)
+    clses = f"plain{outerCls} {hlCls}"
     done.add(n)
-    return f'<span class="{classes}" {hlStyle}>{result}</span>'
+    return f'<span class="{clses}" {hlStyle}>{result}</span>'
 
 
 def getOuterQuads(app, n):

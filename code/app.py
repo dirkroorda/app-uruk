@@ -39,12 +39,12 @@ def commentsCls(app, n, nType, cls):
 
 
 class TfApp(object):
-    def __init__(app, *args, _asApp=False, silent=False, **kwargs):
+    def __init__(app, *args, silent=False, **kwargs):
         atf = loadModule(*args[0:2], "atf")
         atf.atfApi(app)
         app.image = loadModule(*args[0:2], "image")
-        setupApi(app, *args, _asApp=_asApp, silent=silent, **kwargs)
-        notice(args[0])
+        setupApi(app, *args, silent=silent, **kwargs)
+        notice(app)
 
         app.image.getImagery(app, silent, checkout=kwargs.get("checkout", ""))
 
@@ -66,11 +66,16 @@ class TfApp(object):
             quad=((lambda x: True), E.sub.f, False),
         )
         app.afterChild = dict(quad=getOp)
+        app.plainCustom = dict(
+            sign=atf.plainAtfType,
+            quad=atf.plainAtfType,
+            cluster=atf.plainAtfType,
+        )
         app.prettyCustom = dict(
             case=caseDir, cluster=clusterBoundaries, comments=commentsCls
         )
 
-    def webLink(app, n, text=None, className=None, _asString=False, _noUrl=False):
+    def webLink(app, n, text=None, clsName=None, _asString=False, _noUrl=False):
         api = app.api
         L = api.L
         F = api.F
@@ -89,7 +94,7 @@ class TfApp(object):
             linkText,
             url,
             title=title,
-            className=className,
+            clsName=clsName,
             target=target,
             passage=pNum,
         )
@@ -98,7 +103,7 @@ class TfApp(object):
         dh(result)
 
     def cdli(app, n, linkText=None, asString=False):
-        (nType, objectType, identifier) = app.image.imageClass(app, n)
+        (nType, objectType, identifier) = app.image.imageCls(app, n)
         if linkText is None:
             linkText = identifier
         result = app.image.wrapLink(linkText, objectType, "main", identifier)

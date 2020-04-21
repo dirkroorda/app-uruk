@@ -93,40 +93,65 @@ CHILD_TYPE = dict(
     quad={"sign", "quad", "cluster"},
 )
 
-SUPER_TYPE = None
-
-PLAIN_TYPES = dict(
-    sign=(None, False),
-    quad=(None, False),
-    cluster=(None, False),
-    line=("{number}{prime}. ", True),
-    case=("{number}{prime}. ", True),
-    column=("{otype} {number}{prime}", False),
-    face=("{otype} {type}", False),
-    tablet=("{otype} {catalogId}", False),
-)
-
-PRETTY_TYPES = dict(
-    tablet=("{catalogId}", "name period excavation", ""),
-    face=("{type}", "identifer fragment", ""),
-    column=("{number}{prime}", "", ""),
-    line=("{number}{prime}", "", ""),
-    case=("{number}{prime}", "", ""),
-    comment=("{type}", "", "text"),
-    cluster=("{type}", "", ""),
-    quad=("", "", ""),
-    sign=("", "", ""),
-)
-
-LEVELS = dict(
-    tablet=dict(level=3, flow="row", wrap=False, stretch=False),
-    face=dict(level=3, flow="row", wrap=False, strectch=False),
-    column=dict(level=3, flow="col", wrap=False, strectch=False),
-    line=dict(level=2, flow="row", wrap=False, strectch=False),
-    case=dict(level=2, flow="row", wrap=False, strectch=False),
-    cluster=dict(level=2, flow="row", wrap=True, strectch=False),
-    quad=dict(level=1, flow="row", wrap=True, strectch=False),
-    sign=dict(level=0, flow="col", wrap=False, strectch=False),
+TYPE_DISPLAY = dict(
+    tablet=dict(
+        template="{otype} {catalogId}",
+        bareFeatures="name period excavation",
+        features="",
+        childrenPlain=False,
+        level=3, flow="row", wrap=False, stretch=False,
+    ),
+    face=dict(
+        template="{otype} {type}",
+        bareFeatures="identifer fragment",
+        features="",
+        childrenPlain=False,
+        level=3, flow="row", wrap=False, strectch=False,
+    ),
+    column=dict(
+        template="{otype} {number}{prime}",
+        bareFeatures="",
+        features="",
+        childrenPlain=False,
+        level=3, flow="col", wrap=False, strectch=False,
+    ),
+    line=dict(
+        template="{number}{prime}",
+        bareFeatures="",
+        features="",
+        level=2, flow="row", wrap=False, strectch=False,
+    ),
+    case=dict(
+        template="{number}{prime}",
+        bareFeatures="",
+        features="",
+        level=2, flow="row", wrap=False, strectch=False,
+    ),
+    comment=dict(
+        template="{type}",
+        bareFeatures="text",
+        features="",
+    ),
+    cluster=dict(
+        template="{type}",
+        bareFeatures="",
+        features="",
+        childrenPlain=False,
+        level=2, flow="row", wrap=True, strectch=False,
+    ),
+    quad=dict(
+        template="",
+        bareFeatures="",
+        features="",
+        childrenPlain=False,
+        level=1, flow="row", wrap=True, strectch=False,
+    ),
+    sign=dict(
+        template=True,
+        bareFeatures="",
+        features="",
+        level=0, flow="col", wrap=False, strectch=False,
+    ),
 )
 
 INTERFACE_DEFAULTS = dict(
