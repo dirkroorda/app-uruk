@@ -27,38 +27,22 @@ MODULE_SPECS = ()
 
 ZIP = [REPO, (ORG, REPO, RELATIVE_IMAGES)]
 
-BASE_TYPE = "sign"
-CONDENSE_TYPE = "tablet"
-
-NONE_VALUES = {None}
-
-STANDARD_FEATURES = None  # meaning all loadable features
-
-EXCLUDED_FEATURES = set()
-
-NO_DESCEND_TYPES = {"lex"}
-
 EXAMPLE_SECTION = "<code>P005381</code>"
 EXAMPLE_SECTION_TEXT = "P005381"
 
-SECTION_SEP1 = " "
-SECTION_SEP2 = ":"
-
-WRITING = ""
-WRITING_DIR = "ltr"
-
-FONT_NAME = None
-FONT = None
-FONTW = None
-
-TEXT_FORMATS = {}
-
-BROWSE_NAV_LEVEL = 1
-BROWSE_CONTENT_PRETTY = True
-
-VERSE_TYPES = None
-
-LEX = None
+DATA_DISPLAY = dict(
+    noneValues={None},
+    sectionSep1=" ",
+    sectionSep2=":",
+    writing="",
+    writingDir="ltr",
+    fontName=None,
+    font=None,
+    fontw=None,
+    textFormats={},
+    browseNavLevel=1,
+    browseContentPretty=True,
+)
 
 
 def prime(p):
@@ -76,80 +60,69 @@ def ctype(t):
         return ""
 
 
-TRANSFORM = dict(
-    column=dict(prime=prime),
-    line=dict(prime=prime),
-    case=dict(prime=prime),
-    cluster={'type': ctype},
-)
-
-CHILD_TYPE = dict(
-    tablet={"face", "comment"},
-    face={"column", "comment"},
-    column={"line", "comment"},
-    line={"sign", "quad", "cluster", "comment"},
-    case={"sign", "quad", "cluster", "comment"},
-    cluster={"sign", "quad", "cluster"},
-    quad={"sign", "quad", "cluster"},
-)
-
 TYPE_DISPLAY = dict(
     tablet=dict(
         template="{otype} {catalogId}",
-        bareFeatures="name period excavation",
-        features="",
+        featuresBare="name period excavation",
         childrenPlain=False,
+        children={"face", "comment"},
+        condense=True,
+        lineNumber="srcLnNum",
         level=3, flow="row", wrap=False, stretch=False,
     ),
     face=dict(
         template="{otype} {type}",
-        bareFeatures="identifer fragment",
-        features="",
+        featuresBare="identifer fragment",
         childrenPlain=False,
+        children={"column", "comment"},
+        lineNumber="srcLnNum",
         level=3, flow="row", wrap=False, strectch=False,
     ),
     column=dict(
         template="{otype} {number}{prime}",
-        bareFeatures="",
-        features="",
         childrenPlain=False,
+        children={"line", "comment"},
+        transform=dict(prime=prime),
+        lineNumber="srcLnNum",
         level=3, flow="col", wrap=False, strectch=False,
     ),
     line=dict(
         template="{number}{prime}",
-        bareFeatures="",
-        features="",
+        children={"sign", "quad", "cluster", "comment"},
+        transform=dict(prime=prime),
+        lineNumber="srcLnNum",
         level=2, flow="row", wrap=False, strectch=False,
     ),
     case=dict(
         template="{number}{prime}",
-        bareFeatures="",
-        features="",
+        children={"sign", "quad", "cluster", "comment"},
+        transform=dict(prime=prime),
+        lineNumber="srcLnNum",
         level=2, flow="row", wrap=False, strectch=False,
     ),
     comment=dict(
         template="{type}",
-        bareFeatures="text",
-        features="",
+        featuresBare="text",
+        lineNumber="srcLnNum",
     ),
     cluster=dict(
         template="{type}",
-        bareFeatures="",
-        features="",
         childrenPlain=False,
+        children={"sign", "quad", "cluster"},
+        transform=dict(type=ctype),
         level=2, flow="row", wrap=True, strectch=False,
     ),
     quad=dict(
         template="",
-        bareFeatures="",
-        features="",
         childrenPlain=False,
+        children={"sign", "quad", "cluster"},
+        graphics=True,
         level=1, flow="row", wrap=True, strectch=False,
     ),
     sign=dict(
         template=True,
-        bareFeatures="",
-        features="",
+        base=True,
+        graphics=True,
         level=0, flow="col", wrap=False, strectch=False,
     ),
 )
@@ -158,17 +131,6 @@ INTERFACE_DEFAULTS = dict(
     lineNumbers=False,
     graphics=True,
 )
-
-LINE_NUMBERS = dict(
-    case="srcLnNum",
-    line="srcLnNum",
-    comment="srcLnNum",
-    column="srcLnNum",
-    face="srcLnNum",
-    tablet="srcLnNum",
-)
-
-GRAPHICS = dict(sign=True, quad=True)
 
 
 def deliver():

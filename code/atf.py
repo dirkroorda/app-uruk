@@ -33,19 +33,19 @@ def atfApi(app):
     app.casesByLevel = types.MethodType(casesByLevel, app)
 
 
-def plainAtfType(app, d, g, r, n, outer, done=set()):
+def plainAtfType(app, dContext, g, r, n, outer, done=set()):
     nType = r.nType
     isSign = nType == "sign"
     isQuad = nType == "quad"
     text = (
-        app.atfFromSign(n, display=d, done=done) + " "
+        app.atfFromSign(n, dContext=dContext, done=done) + " "
         if isSign
-        else app.atfFromQuad(n, display=d, done=done) + " "
+        else app.atfFromQuad(n, dContext=dContext, done=done) + " "
         if isQuad
-        else app.atfFromCluster(n, display=d, done=done)
+        else app.atfFromCluster(n, dContext=dContext, done=done)
     )
     theLineart = ""
-    if d.graphics:
+    if dContext.graphics:
         if isSign or isQuad:
             width = "2em" if isSign else "4em"
             height = "4em" if isSign else "6em"
@@ -85,13 +85,13 @@ def getSource(app, node, nodeType=None, lineNumbers=False):
     return sourceLines
 
 
-def atfFromSign(app, n, flags=False, display=None, outerCls="", done=set()):
+def atfFromSign(app, n, flags=False, dContext=None, outerCls="", done=set()):
     F = app.api.F
     Fs = app.api.Fs
 
     if F.otype.v(n) != "sign":
         result = "«no sign»"
-        return _deliver(app, n, result, display, outerCls)
+        return _deliver(app, n, result, dContext, outerCls)
 
     grapheme = F.grapheme.v(n)
     if grapheme == "…":
@@ -132,11 +132,11 @@ def atfFromSign(app, n, flags=False, display=None, outerCls="", done=set()):
                 else:
                     result += char
 
-    return _deliver(app, n, result, display, outerCls, done)
+    return _deliver(app, n, result, dContext, outerCls, done)
 
 
 def atfFromQuad(
-    app, n, flags=False, outer=True, display=None, outerCls="", done=set()
+    app, n, flags=False, outer=True, dContext=None, outerCls="", done=set()
 ):
     api = app.api
     E = api.E
@@ -145,12 +145,12 @@ def atfFromQuad(
 
     if F.otype.v(n) != "quad":
         result = "«no quad»"
-        return _deliver(app, n, result, display, outerCls)
+        return _deliver(app, n, result, dContext, outerCls)
 
     children = E.sub.f(n)
     if not children or len(children) < 2:
         result = f"«quad with less than two sub-quads»"
-        return _deliver(app, n, result, display, outerCls)
+        return _deliver(app, n, result, dContext, outerCls)
 
     result = ""
     for child in children:
@@ -166,13 +166,13 @@ def atfFromQuad(
                 child,
                 flags=flags,
                 outer=False,
-                display=display,
+                dContext=dContext,
                 outerCls=outerCls,
                 done=done,
             )
             if childType == "quad"
             else app.atfFromSign(
-                child, flags=flags, display=display, outerCls=outerCls, done=done,
+                child, flags=flags, dContext=dContext, outerCls=outerCls, done=done,
             )
         )
         result += f"{thisResult}{op}"
@@ -213,40 +213,40 @@ def atfFromQuad(
             else:
                 result = f"({result})"
 
-    return _deliver(app, n, result, display, outerCls, done)
+    return _deliver(app, n, result, dContext, outerCls, done)
 
 
-def atfFromOuterQuad(app, n, flags=False, display=None, outerCls="", done=set()):
+def atfFromOuterQuad(app, n, flags=False, dContext=None, outerCls="", done=set()):
     api = app.api
     F = api.F
     nodeType = F.otype.v(n)
     if nodeType == "sign":
         result = app.atfFromSign(
-            n, flags=flags, display=display, outerCls=outerCls, done=done
+            n, flags=flags, dContext=dContext, outerCls=outerCls, done=done
         )
     elif nodeType == "quad":
         result = app.atfFromQuad(
             n,
             flags=flags,
             outer=True,
-            display=display,
+            dContext=dContext,
             outerCls=outerCls,
             done=done,
         )
     else:
         result = "«no outer quad»"
 
-    return _deliver(app, n, result, display, outerCls, done)
+    return _deliver(app, n, result, dContext, outerCls, done)
 
 
-def atfFromCluster(app, n, seen=None, display=None, outerCls="", done=set()):
+def atfFromCluster(app, n, seen=None, dContext=None, outerCls="", done=set()):
     api = app.api
     F = api.F
     E = api.E
 
     if F.otype.v(n) != "cluster":
         result = "«no cluster»"
-        return _deliver(app, n, result, display, outerCls)
+        return _deliver(app, n, result, dContext, outerCls)
 
     typ = F.type.v(n)
     (bOpen, bClose) = CLUSTER_BRACKETS[typ]
@@ -264,15 +264,15 @@ def atfFromCluster(app, n, seen=None, display=None, outerCls="", done=set()):
 
         thisResult = (
             app.atfFromCluster(
-                child, seen=seen, display=display, outerCls=outerCls, done=done,
+                child, seen=seen, dContext=dContext, outerCls=outerCls, done=done,
             )
             if childType == "cluster"
             else app.atfFromQuad(
-                child, flags=True, display=display, outerCls=outerCls, done=done,
+                child, flags=True, dContext=dContext, outerCls=outerCls, done=done,
             )
             if childType == "quad"
             else app.atfFromSign(
-                child, flags=True, display=display, outerCls=outerCls, done=done,
+                child, flags=True, dContext=dContext, outerCls=outerCls, done=done,
             )
             if childType == "sign"
             else None
@@ -283,13 +283,13 @@ def atfFromCluster(app, n, seen=None, display=None, outerCls="", done=set()):
         result.append(thisResult)
     result = f'{bOpen}{" ".join(result)}{bClose}'
 
-    return _deliver(app, n, result, display, outerCls, done)
+    return _deliver(app, n, result, dContext, outerCls, done)
 
 
-def _deliver(app, n, result, display, outerCls, done):
-    if display is None:
+def _deliver(app, n, result, dContext, outerCls, done):
+    if dContext is None:
         return result
-    (hlCls, hlStyle) = getHlAtt(app, n, display.highlights, display.baseType, True)
+    (hlCls, hlStyle) = getHlAtt(app, n, dContext.highlights, dContext.baseType, True)
     clses = f"plain{outerCls} {hlCls}"
     done.add(n)
     return f'<span class="{clses}" {hlStyle}>{result}</span>'

@@ -52,6 +52,8 @@ class TfApp(object):
         F = api.F
         E = api.E
 
+        ac = app.context
+
         def getOp(ch):
             result = ""
             nextChildren = E.op.f(ch)
@@ -60,18 +62,22 @@ class TfApp(object):
                 result = f'<div class="op">{op}</div>'
             return result
 
-        app.childrenCustom = dict(
+        ac.childrenCustom.clear()
+        ac.childrenCustom.update(
             line=((lambda x: not F.terminal.v(x)), E.sub.f, False),
             case=((lambda x: not F.terminal.v(x)), E.sub.f, False),
             quad=((lambda x: True), E.sub.f, False),
         )
-        app.afterChild = dict(quad=getOp)
-        app.plainCustom = dict(
+        ac.afterChild.clear()
+        ac.afterChild.update(quad=getOp)
+        ac.plainCustom.clear()
+        ac.plainCustom.update(
             sign=atf.plainAtfType,
             quad=atf.plainAtfType,
             cluster=atf.plainAtfType,
         )
-        app.prettyCustom = dict(
+        ac.prettyCustom.clear()
+        ac.prettyCustom.update(
             case=caseDir, cluster=clusterBoundaries, comments=commentsCls
         )
 
