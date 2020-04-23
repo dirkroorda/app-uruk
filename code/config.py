@@ -30,19 +30,7 @@ ZIP = [REPO, (ORG, REPO, RELATIVE_IMAGES)]
 EXAMPLE_SECTION = "<code>P005381</code>"
 EXAMPLE_SECTION_TEXT = "P005381"
 
-DATA_DISPLAY = dict(
-    noneValues={None},
-    sectionSep1=" ",
-    sectionSep2=":",
-    writing="",
-    writingDir="ltr",
-    fontName=None,
-    font=None,
-    fontw=None,
-    textFormats={},
-    browseNavLevel=1,
-    browseContentPretty=True,
-)
+DATA_DISPLAY = dict(browseNavLevel=1, browseContentPretty=True,)
 
 
 def prime(p):
@@ -62,13 +50,14 @@ def ctype(t):
 
 TYPE_DISPLAY = dict(
     tablet=dict(
-        template="{otype} {catalogId}",
         featuresBare="name period excavation",
         childrenPlain=False,
         children={"face", "comment"},
         condense=True,
         lineNumber="srcLnNum",
-        level=3, flow="row", wrap=False, stretch=False,
+        flow="row",
+        wrap=False,
+        stretch=False,
     ),
     face=dict(
         template="{otype} {type}",
@@ -76,61 +65,55 @@ TYPE_DISPLAY = dict(
         childrenPlain=False,
         children={"column", "comment"},
         lineNumber="srcLnNum",
-        level=3, flow="row", wrap=False, strectch=False,
+        flow="row",
+        wrap=False,
+        stretch=False,
     ),
     column=dict(
-        template="{otype} {number}{prime}",
         childrenPlain=False,
         children={"line", "comment"},
         transform=dict(prime=prime),
         lineNumber="srcLnNum",
-        level=3, flow="col", wrap=False, strectch=False,
+        level=3,
+        flow="col",
     ),
     line=dict(
-        template="{number}{prime}",
         children={"sign", "quad", "cluster", "comment"},
         transform=dict(prime=prime),
         lineNumber="srcLnNum",
-        level=2, flow="row", wrap=False, strectch=False,
+        level=2,
+        flow="row",
+        wrap=False,
+        stretch=False,
     ),
     case=dict(
         template="{number}{prime}",
         children={"sign", "quad", "cluster", "comment"},
         transform=dict(prime=prime),
         lineNumber="srcLnNum",
-        level=2, flow="row", wrap=False, strectch=False,
+        level=2,
+        flow="row",
+        wrap=False,
+        stretch=False,
     ),
-    comment=dict(
-        template="{type}",
-        featuresBare="text",
-        lineNumber="srcLnNum",
-    ),
+    comment=dict(template="{type}", featuresBare="text", lineNumber="srcLnNum",),
     cluster=dict(
         template="{type}",
         childrenPlain=False,
         children={"sign", "quad", "cluster"},
         transform=dict(type=ctype),
-        level=2, flow="row", wrap=True, strectch=False,
+        stretch=False,
     ),
     quad=dict(
-        template="",
         childrenPlain=False,
         children={"sign", "quad", "cluster"},
         graphics=True,
-        level=1, flow="row", wrap=True, strectch=False,
+        stretch=False,
     ),
-    sign=dict(
-        template=True,
-        base=True,
-        graphics=True,
-        level=0, flow="col", wrap=False, strectch=False,
-    ),
+    sign=dict(graphics=True,),
 )
 
-INTERFACE_DEFAULTS = dict(
-    lineNumbers=False,
-    graphics=True,
-)
+INTERFACE_DEFAULTS = dict(lineNumbers=False, graphics=True,)
 
 
 def deliver():
