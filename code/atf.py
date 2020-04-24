@@ -45,7 +45,7 @@ def plainAtfType(app, dContext, g, r, n, outer, done=set()):
         else app.atfFromCluster(n, dContext=dContext, done=done)
     )
     theLineart = ""
-    if dContext.graphics:
+    if dContext.showGraphics:
         if isSign or isQuad:
             width = "2em" if isSign else "4em"
             height = "4em" if isSign else "6em"

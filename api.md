@@ -31,7 +31,7 @@ accept additional options:
 
 ## graphics
 
-`graphics` indicates whether to display a piece of graphics with the node
+`showGraphics` indicates whether to display a piece of graphics with the node
 (only relevant for signs and quads)
 
 ## lineNumbers

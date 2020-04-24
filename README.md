@@ -7,7 +7,7 @@
 [![DOI](https://zenodo.org/badge/161639327.svg)](https://zenodo.org/badge/latestdoi/161639327)
 
 This is a
-[Text-Fabric](https://githubv.com/annotation/text-fabric) app
+[Text-Fabric](https://github.com/annotation/text-fabric) app
 for working with the
 [Uruk](https://github.com/Nino-cunei/uruk) corpus: Proto Cuneiform Tablets from the Uruk IV/III period.
 

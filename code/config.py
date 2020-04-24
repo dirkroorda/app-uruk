@@ -2,35 +2,24 @@ from os.path import dirname, abspath
 
 API_VERSION = 1
 
-PROTOCOL = "http://"
-HOST = "localhost"
-PORT = dict(kernel=18984, web=8104)
+PROVENANCE_SPEC = dict(
+    org="Nino-cunei",
+    repo="uruk",
+    version="1.0",
+    relative=f"tf/uruk",
+    graphics="sources/cdli/images",
+    doi="10.5281/zenodo.1193841",
+    corpus="Uruk IV/III: Proto-cuneiform tablets ",
+    webBase="https://cdli.ucla.edu",
+    webUrl="/search/search_results.php?SearchMode=Text&ObjectID=<1>",
+    webHint="to CDLI main page for this tablet",
+)
 
-ORG = "Nino-cunei"
-REPO = "uruk"
-CORPUS = "Uruk IV/III: Proto-cuneiform tablets "
-VERSION = "1.0"
-RELATIVE = f"tf/{REPO}"
-RELATIVE_IMAGES = "sources/cdli/images"
+DOCS = dict(
+    docPage="about", featureBase="{docBase}/transcription{docExt}", featurePage=""
+)
 
-DOI_TEXT = "10.5281/zenodo.1193841"
-DOI_URL = "https://doi.org/10.5281/zenodo.1193841"
-
-DOC_URL = f"https://github.com/{ORG}/{REPO}/blob/master/docs/"
-DOC_INTRO = "about.md"
-CHAR_URL = f"https://github.com/{ORG}/{REPO}/blob/master/docs/transcription.md"
-CHAR_TEXT = "How TF features represent ATF"
-
-FEATURE_URL = f"{DOC_URL}/transcription.md"
-
-MODULE_SPECS = ()
-
-ZIP = [REPO, (ORG, REPO, RELATIVE_IMAGES)]
-
-EXAMPLE_SECTION = "<code>P005381</code>"
-EXAMPLE_SECTION_TEXT = "P005381"
-
-DATA_DISPLAY = dict(browseNavLevel=1, browseContentPretty=True,)
+DATA_DISPLAY = dict(browseNavLevel=1, browseContentPretty=True)
 
 
 def prime(p):
@@ -96,7 +85,7 @@ TYPE_DISPLAY = dict(
         wrap=False,
         stretch=False,
     ),
-    comment=dict(template="{type}", featuresBare="text", lineNumber="srcLnNum",),
+    comment=dict(template="{type}", featuresBare="text", lineNumber="srcLnNum"),
     cluster=dict(
         template="{type}",
         childrenPlain=False,
@@ -110,10 +99,10 @@ TYPE_DISPLAY = dict(
         graphics=True,
         stretch=False,
     ),
-    sign=dict(graphics=True,),
+    sign=dict(graphics=True),
 )
 
-INTERFACE_DEFAULTS = dict(lineNumbers=False, graphics=True,)
+INTERFACE_DEFAULTS = dict(lineNumbers=False, showGraphics=True)
 
 
 def deliver():

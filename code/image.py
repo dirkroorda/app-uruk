@@ -263,7 +263,7 @@ def getImagery(app, silent, checkout=""):
     (imageRelease, imageCommit, imageLocal, imageBase, imageDir) = checkoutRepo(
         org=app.org,
         repo=app.repo,
-        folder=app.relativeImages,
+        folder=app.graphics,
         version="",
         checkout=checkout,
         withPaths=True,
@@ -273,7 +273,7 @@ def getImagery(app, silent, checkout=""):
     if not imageBase:
         app.api = None
         return
-    app.imageDir = f"{imageBase}/{app.org}/{app.repo}/{app.relativeImages}"
+    app.imageDir = f"{imageBase}/{app.org}/{app.repo}/{app.graphics}"
 
     app._imagery = {}
     for (dirFmt, ext, kind, objectType) in (

@@ -1,7 +1,6 @@
 from tf.applib.helpers import dh
 from tf.applib.app import loadModule
 from tf.applib.api import setupApi
-from tf.applib.links import outLink
 
 
 def notice(app):
@@ -17,25 +16,6 @@ Hint:
 
 """
         )
-
-
-def caseDir(app, n, nType, cls):
-    api = app.api
-    F = api.F
-
-    wrap = app.levels[nType]["wrap"]
-    flow = "col" if F.depth.v(n) & 1 else "row"
-    cls.update(dict(children=f"children {flow} {wrap}"))
-
-
-def clusterBoundaries(app, n, nType, cls):
-    lbl = cls.pop("label")
-    cls.update(dict(labelb=f"{lbl} {nType}b", labele=f"{lbl} {nType}e"))
-    cls["container"] += f" {nType}"
-
-
-def commentsCls(app, n, nType, cls):
-    cls["container"] += f" {nType}"
 
 
 class TfApp(object):
@@ -80,33 +60,6 @@ class TfApp(object):
         ac.prettyCustom.update(
             case=caseDir, cluster=clusterBoundaries, comments=commentsCls
         )
-
-    def webLink(app, n, text=None, clsName=None, _asString=False, _noUrl=False):
-        api = app.api
-        L = api.L
-        F = api.F
-        if type(n) is str:
-            pNum = n
-        else:
-            refNode = n if F.otype.v(n) == "tablet" else L.u(n, otype="tablet")[0]
-            pNum = F.catalogId.v(refNode)
-
-        title = None if _noUrl else ("to CDLI main page for this tablet")
-        linkText = pNum if text is None else text
-        url = "#" if _noUrl else app.image.URL_FORMAT["tablet"]["main"].format(pNum)
-        target = "" if _noUrl else None
-
-        result = outLink(
-            linkText,
-            url,
-            title=title,
-            clsName=clsName,
-            target=target,
-            passage=pNum,
-        )
-        if _asString:
-            return result
-        dh(result)
 
     def cdli(app, n, linkText=None, asString=False):
         (nType, objectType, identifier) = app.image.imageCls(app, n)
@@ -170,3 +123,22 @@ class TfApp(object):
 
     def imagery(app, objectType, kind):
         return set(app._imagery.get(objectType, {}).get(kind, {}))
+
+
+def caseDir(app, n, nType, cls):
+    api = app.api
+    F = api.F
+
+    wrap = app.levels[nType]["wrap"]
+    flow = "col" if F.depth.v(n) & 1 else "row"
+    cls.update(dict(children=f"children {flow} {wrap}"))
+
+
+def clusterBoundaries(app, n, nType, cls):
+    lbl = cls.pop("label")
+    cls.update(dict(labelb=f"{lbl} {nType}b", labele=f"{lbl} {nType}e"))
+    cls["container"] += f" {nType}"
+
+
+def commentsCls(app, n, nType, cls):
+    cls["container"] += f" {nType}"
