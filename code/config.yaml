@@ -1,0 +1,106 @@
+apiVersion: 1
+dataDisplay:
+  browseContentPretty: true
+  browseNavLevel: 1
+docs:
+  docPage: about
+  featureBase: '{docBase}/transcription{docExt}'
+  featurePage: ''
+interfaceDefaults:
+  lineNumbers: false
+  showGraphics: true
+provenanceSpec:
+  corpus: 'Uruk IV/III: Proto-cuneiform tablets '
+  doi: 10.5281/zenodo.1193841
+  graphics: sources/cdli/images
+  org: Nino-cunei
+  relative: tf/uruk
+  repo: uruk
+  version: '1.0'
+  webBase: https://cdli.ucla.edu
+  webHint: to CDLI main page for this tablet
+  webUrl: /search/search_results.php?SearchMode=Text&ObjectID=<1>
+typeDisplay:
+  case:
+    children:
+    - cluster
+    - comment
+    - quad
+    - sign
+    flow: row
+    level: 2
+    lineNumber: srcLnNum
+    stretch: false
+    template: '{number}{prime}'
+    transform:
+      prime: prime
+    wrap: false
+  cluster:
+    children:
+    - cluster
+    - quad
+    - sign
+    childrenPlain: false
+    stretch: false
+    template: '{type}'
+    transform:
+      type: ctype
+  column:
+    children:
+    - comment
+    - line
+    childrenPlain: false
+    flow: col
+    level: 3
+    lineNumber: srcLnNum
+    transform:
+      prime: prime
+  comment:
+    featuresBare: text
+    lineNumber: srcLnNum
+    template: '{type}'
+  face:
+    children:
+    - column
+    - comment
+    childrenPlain: false
+    featuresBare: identifer fragment
+    flow: row
+    lineNumber: srcLnNum
+    stretch: false
+    template: '{otype} {type}'
+    wrap: false
+  line:
+    children:
+    - cluster
+    - comment
+    - quad
+    - sign
+    flow: row
+    level: 2
+    lineNumber: srcLnNum
+    stretch: false
+    transform:
+      prime: prime
+    wrap: false
+  quad:
+    children:
+    - cluster
+    - quad
+    - sign
+    childrenPlain: false
+    graphics: true
+    stretch: false
+  sign:
+    graphics: true
+  tablet:
+    children:
+    - comment
+    - face
+    childrenPlain: false
+    condense: true
+    featuresBare: name period excavation
+    flow: row
+    lineNumber: srcLnNum
+    stretch: false
+    wrap: false

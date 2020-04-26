@@ -1,6 +1,6 @@
 from tf.applib.helpers import dh
-from tf.applib.app import loadModule
-from tf.applib.api import setupApi
+from tf.applib.find import loadModule
+from tf.applib.app import App
 
 
 def notice(app):
@@ -18,13 +18,27 @@ Hint:
         )
 
 
-class TfApp(object):
+def transform_prime(p):
+    return "'" * p if p else ""
+
+
+def transform_ctype(t):
+    if t == "uncertain":
+        return "?"
+    elif t == "properName":
+        return "="
+    elif t == "supplied":
+        return "&gt;"
+    else:
+        return ""
+
+
+class TfApp(App):
     def __init__(app, *args, silent=False, **kwargs):
         atf = loadModule(*args[0:2], "atf")
         atf.atfApi(app)
         app.image = loadModule(*args[0:2], "image")
-        setupApi(app, *args, silent=silent, **kwargs)
-        notice(app)
+        super().__init__(*args, silent=silent, **kwargs)
 
         app.image.getImagery(app, silent, checkout=kwargs.get("checkout", ""))
 
