@@ -3,36 +3,6 @@ from tf.applib.find import loadModule
 from tf.applib.app import App
 
 
-def notice(app):
-    if int(app.api.TF.version.split(".")[0]) <= 7:
-        print(
-            f"""
-Your Text-Fabric is outdated.
-It cannot load this version of the TF app `{app.appName}`.
-Recommendation: upgrade Text-Fabric to version 8.
-Hint:
-
-    pip3 install --upgrade text-fabric
-
-"""
-        )
-
-
-def transform_prime(p):
-    return "'" * p if p else ""
-
-
-def transform_ctype(t):
-    if t == "uncertain":
-        return "?"
-    elif t == "properName":
-        return "="
-    elif t == "supplied":
-        return "&gt;"
-    else:
-        return ""
-
-
 class TfApp(App):
     def __init__(app, *args, silent=False, **kwargs):
         atf = loadModule(*args[0:2], "atf")
@@ -156,3 +126,18 @@ def clusterBoundaries(app, n, nType, cls):
 
 def commentsCls(app, n, nType, cls):
     cls["container"] += f" {nType}"
+
+
+def transform_prime(p):
+    return "'" * p if p else ""
+
+
+def transform_ctype(t):
+    if t == "uncertain":
+        return "?"
+    elif t == "properName":
+        return "="
+    elif t == "supplied":
+        return "&gt;"
+    else:
+        return ""
