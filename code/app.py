@@ -45,15 +45,28 @@ class TfApp(App):
             case=caseDir, cluster=clusterBoundaries, comments=commentsCls
         )
 
-    def cdli(app, n, linkText=None, asString=False):
-        (nType, objectType, identifier) = app.image.imageCls(app, n)
-        if linkText is None:
-            linkText = identifier
-        result = app.image.wrapLink(linkText, objectType, "main", identifier)
-        if asString:
-            return result
-        else:
-            dh(result)
+        def transform_prime(app, p):
+            return "'" * p if p else ""
+
+        def transform_ctype(app, t):
+            if t == "uncertain":
+                return "?"
+            elif t == "properName":
+                return "="
+            elif t == "supplied":
+                return "&gt;"
+            else:
+                return ""
+
+        def cdli(app, n, linkText=None, asString=False):
+            (nType, objectType, identifier) = app.image.imageCls(app, n)
+            if linkText is None:
+                linkText = identifier
+            result = app.image.wrapLink(linkText, objectType, "main", identifier)
+            if asString:
+                return result
+            else:
+                dh(result)
 
     # PRETTY HELPERS
 
@@ -126,18 +139,3 @@ def clusterBoundaries(app, n, nType, cls):
 
 def commentsCls(app, n, nType, cls):
     cls["container"] += f" {nType}"
-
-
-def transform_prime(p):
-    return "'" * p if p else ""
-
-
-def transform_ctype(t):
-    if t == "uncertain":
-        return "?"
-    elif t == "properName":
-        return "="
-    elif t == "supplied":
-        return "&gt;"
-    else:
-        return ""
