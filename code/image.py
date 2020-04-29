@@ -221,11 +221,13 @@ def getImages(
 
 def _useImage(app, image, kind, key, node):
     _browse = app._browse
+    aContext = app.context
+
     api = app.api
     F = api.F
     (imageDir, imageName) = os.path.split(image)
     (base, ext) = os.path.splitext(imageName)
-    localBase = app.localDir if _browse else app.curDir
+    localBase = aContext.localDir if _browse else app.curDir
     localDir = f"{localBase}/{LOCAL_IMAGE_DIR}"
     if not os.path.exists(localDir):
         os.makedirs(localDir, exist_ok=True)
@@ -260,10 +262,15 @@ def _useImage(app, image, kind, key, node):
 
 
 def getImagery(app, silent, checkout=""):
+    aContext = app.context
+    org = aContext.org
+    repo = aContext.repo
+    graphics = aContext.graphics
+
     (imageRelease, imageCommit, imageLocal, imageBase, imageDir) = checkoutRepo(
-        org=app.org,
-        repo=app.repo,
-        folder=app.graphics,
+        org=org,
+        repo=repo,
+        folder=graphics,
         version="",
         checkout=checkout,
         withPaths=True,
@@ -273,7 +280,8 @@ def getImagery(app, silent, checkout=""):
     if not imageBase:
         app.api = None
         return
-    app.imageDir = f"{imageBase}/{app.org}/{app.repo}/{app.graphics}"
+
+    app.imageDir = f"{imageBase}/{org}/{repo}/{graphics}"
 
     app._imagery = {}
     for (dirFmt, ext, kind, objectType) in (
@@ -304,7 +312,7 @@ def getImagery(app, silent, checkout=""):
                 key = ""
             images.setdefault(identifier, {})[key] = filePath
         app._imagery.setdefault(objectType, {})[kind] = images
-        if not app.silent:
+        if not silent:
             console(f"Found {len(images)} {objectType} {kind}s")
 
 

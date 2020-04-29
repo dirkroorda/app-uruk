@@ -32,6 +32,7 @@ typeDisplay:
     lineNumber: srcLnNum
     stretch: false
     template: '{number}{prime}'
+    label: '{number}{prime}'
     transform:
       prime: prime
     wrap: false
@@ -42,7 +43,7 @@ typeDisplay:
     - sign
     childrenPlain: false
     stretch: false
-    template: '{type}'
+    label: '{type}'
     transform:
       type: ctype
   column:
@@ -58,7 +59,7 @@ typeDisplay:
   comment:
     featuresBare: text
     lineNumber: srcLnNum
-    template: '{type}'
+    label: '{type}'
   face:
     children:
     - column
@@ -68,7 +69,8 @@ typeDisplay:
     flow: row
     lineNumber: srcLnNum
     stretch: false
-    template: '{otype} {type}'
+    template: '{type}'
+    label: '{type}'
     wrap: false
   line:
     children:

@@ -1,14 +1,32 @@
+import types
 from tf.applib.helpers import dh
 from tf.applib.find import loadModule
 from tf.applib.app import App
 
 
+def transform_prime(app, p):
+    return "'" * p if p else ""
+
+
+def transform_ctype(app, t):
+    if t == "uncertain":
+        return "?"
+    elif t == "properName":
+        return "="
+    elif t == "supplied":
+        return "&gt;"
+    else:
+        return ""
+
+
 class TfApp(App):
     def __init__(app, *args, silent=False, **kwargs):
+        app.transform_ctype = types.MethodType(transform_ctype, app)
+        app.transform_prime = types.MethodType(transform_prime, app)
         atf = loadModule(*args[0:2], "atf")
         atf.atfApi(app)
-        app.image = loadModule(*args[0:2], "image")
         super().__init__(*args, silent=silent, **kwargs)
+        app.image = loadModule(*args[0:2], "image")
 
         app.image.getImagery(app, silent, checkout=kwargs.get("checkout", ""))
 
@@ -36,27 +54,12 @@ class TfApp(App):
         ac.afterChild.update(quad=getOp)
         ac.plainCustom.clear()
         ac.plainCustom.update(
-            sign=atf.plainAtfType,
-            quad=atf.plainAtfType,
-            cluster=atf.plainAtfType,
+            sign=atf.plainAtfType, quad=atf.plainAtfType, cluster=atf.plainAtfType,
         )
         ac.prettyCustom.clear()
         ac.prettyCustom.update(
             case=caseDir, cluster=clusterBoundaries, comments=commentsCls
         )
-
-        def transform_prime(app, p):
-            return "'" * p if p else ""
-
-        def transform_ctype(app, t):
-            if t == "uncertain":
-                return "?"
-            elif t == "properName":
-                return "="
-            elif t == "supplied":
-                return "&gt;"
-            else:
-                return ""
 
         def cdli(app, n, linkText=None, asString=False):
             (nType, objectType, identifier) = app.image.imageCls(app, n)
