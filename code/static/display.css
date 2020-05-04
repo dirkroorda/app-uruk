@@ -2,10 +2,8 @@
     flex-flow: row wrap;
     border: 0;
 }
-.contnr.comment {
-    background-color: #eeccbb;
-    border: 0.2em solid #eecc99;
-    border-radius: 0.1rem;
+.meta .features {
+    background-color: #ffeedd;
 }
 .lbl.clusterb,.lbl.clustere {
     padding:  0.5em 0.1em 0.1em 0.1em;

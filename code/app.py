@@ -4,11 +4,11 @@ from tf.applib.find import loadModule
 from tf.applib.app import App
 
 
-def transform_prime(app, p):
+def transform_prime(app, n, p):
     return "'" * p if p else ""
 
 
-def transform_ctype(app, t):
+def transform_ctype(app, n, t):
     if t == "uncertain":
         return "?"
     elif t == "properName":
@@ -19,22 +19,32 @@ def transform_ctype(app, t):
         return ""
 
 
+def transform_atf(app, n, a):
+    return app.atfFromSign(n, flags=True)
+
+
 class TfApp(App):
     def __init__(app, *args, silent=False, **kwargs):
         app.transform_ctype = types.MethodType(transform_ctype, app)
         app.transform_prime = types.MethodType(transform_prime, app)
+        app.transform_atf = types.MethodType(transform_atf, app)
+
         atf = loadModule(*args[0:2], "atf")
         atf.atfApi(app)
+        app.atf = atf
         super().__init__(*args, silent=silent, **kwargs)
         app.image = loadModule(*args[0:2], "image")
 
         app.image.getImagery(app, silent, checkout=kwargs.get("checkout", ""))
 
+        app.reinit()
+
+    def reinit(app):
+        aContext = app.context
+        atf = app.atf
         api = app.api
         F = api.F
         E = api.E
-
-        ac = app.context
 
         def getOp(ch):
             result = ""
@@ -44,32 +54,32 @@ class TfApp(App):
                 result = f'<div class="op">{op}</div>'
             return result
 
-        ac.childrenCustom.clear()
-        ac.childrenCustom.update(
+        aContext.childrenCustom.clear()
+        aContext.childrenCustom.update(
             line=((lambda x: not F.terminal.v(x)), E.sub.f, False),
             case=((lambda x: not F.terminal.v(x)), E.sub.f, False),
             quad=((lambda x: True), E.sub.f, False),
         )
-        ac.afterChild.clear()
-        ac.afterChild.update(quad=getOp)
-        ac.plainCustom.clear()
-        ac.plainCustom.update(
+        aContext.afterChild.clear()
+        aContext.afterChild.update(quad=getOp)
+        aContext.plainCustom.clear()
+        aContext.plainCustom.update(
             sign=atf.plainAtfType, quad=atf.plainAtfType, cluster=atf.plainAtfType,
         )
-        ac.prettyCustom.clear()
-        ac.prettyCustom.update(
+        aContext.prettyCustom.clear()
+        aContext.prettyCustom.update(
             case=caseDir, cluster=clusterBoundaries, comments=commentsCls
         )
 
-        def cdli(app, n, linkText=None, asString=False):
-            (nType, objectType, identifier) = app.image.imageCls(app, n)
-            if linkText is None:
-                linkText = identifier
-            result = app.image.wrapLink(linkText, objectType, "main", identifier)
-            if asString:
-                return result
-            else:
-                dh(result)
+    def cdli(app, n, linkText=None, asString=False):
+        (nType, objectType, identifier) = app.image.imageCls(app, n)
+        if linkText is None:
+            linkText = identifier
+        result = app.image.wrapLink(linkText, objectType, "main", identifier)
+        if asString:
+            return result
+        else:
+            dh(result)
 
     # PRETTY HELPERS
 
@@ -126,10 +136,11 @@ class TfApp(App):
 
 
 def caseDir(app, n, nType, cls):
+    aContext = app.context
     api = app.api
     F = api.F
 
-    wrap = app.levels[nType]["wrap"]
+    wrap = aContext.levels[nType]["wrap"]
     flow = "col" if F.depth.v(n) & 1 else "row"
     cls.update(dict(children=f"children {flow} {wrap}"))
 

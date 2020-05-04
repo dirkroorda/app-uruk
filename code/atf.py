@@ -286,7 +286,7 @@ def atfFromCluster(app, n, dContext=None, outerCls="", seen=set()):
 def _deliver(app, n, result, dContext, outerCls, seen):
     if dContext is None:
         return result
-    (hlCls, hlStyle) = getHlAtt(app, n, dContext.highlights, dContext.baseType, True)
+    (hlCls, hlStyle) = getHlAtt(app, n, dContext.highlights, dContext.baseTypes, True)
     clses = f"plain{outerCls} {hlCls}"
     seen.add(n)
     return f'<span class="{clses}" {hlStyle}>{result}</span>'

@@ -12,7 +12,7 @@ interfaceDefaults:
 provenanceSpec:
   corpus: 'Uruk IV/III: Proto-cuneiform tablets '
   doi: 10.5281/zenodo.1193841
-  graphics: sources/cdli/images
+  graphicsRelative: sources/cdli/images
   org: Nino-cunei
   relative: tf/uruk
   repo: uruk
@@ -28,11 +28,11 @@ typeDisplay:
     - quad
     - sign
     flow: row
+    label: '{number}{prime}'
     level: 2
     lineNumber: srcLnNum
     stretch: false
     template: '{number}{prime}'
-    label: '{number}{prime}'
     transform:
       prime: prime
     wrap: false
@@ -42,8 +42,8 @@ typeDisplay:
     - quad
     - sign
     childrenPlain: false
-    stretch: false
     label: '{type}'
+    stretch: false
     transform:
       type: ctype
   column:
@@ -53,32 +53,36 @@ typeDisplay:
     childrenPlain: false
     flow: col
     level: 3
+    label: '{number}{prime}'
     lineNumber: srcLnNum
     transform:
       prime: prime
   comment:
     featuresBare: text
-    lineNumber: srcLnNum
     label: '{type}'
+    lineNumber: srcLnNum
+    base: true
   face:
     children:
     - column
     - comment
     childrenPlain: false
-    featuresBare: identifer fragment
+    featuresBare: identifier fragment
     flow: row
+    label: '{type}'
     lineNumber: srcLnNum
     stretch: false
     template: '{type}'
-    label: '{type}'
     wrap: false
   line:
     children:
+    - case
     - cluster
     - comment
     - quad
     - sign
     flow: row
+    label: '{number}'
     level: 2
     lineNumber: srcLnNum
     stretch: false
@@ -94,7 +98,10 @@ typeDisplay:
     graphics: true
     stretch: false
   sign:
+    label: "{atf}"
     graphics: true
+    transform:
+      atf: atf
   tablet:
     children:
     - comment
@@ -102,7 +109,7 @@ typeDisplay:
     childrenPlain: false
     condense: true
     featuresBare: name period excavation
-    flow: row
+    flow: col
     lineNumber: srcLnNum
     stretch: false
     wrap: false

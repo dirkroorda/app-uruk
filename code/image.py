@@ -265,12 +265,12 @@ def getImagery(app, silent, checkout=""):
     aContext = app.context
     org = aContext.org
     repo = aContext.repo
-    graphics = aContext.graphics
+    graphicsRelative = aContext.graphicsRelative
 
     (imageRelease, imageCommit, imageLocal, imageBase, imageDir) = checkoutRepo(
         org=org,
         repo=repo,
-        folder=graphics,
+        folder=graphicsRelative,
         version="",
         checkout=checkout,
         withPaths=True,
@@ -281,7 +281,7 @@ def getImagery(app, silent, checkout=""):
         app.api = None
         return
 
-    app.imageDir = f"{imageBase}/{org}/{repo}/{graphics}"
+    app.imageDir = f"{imageBase}/{org}/{repo}/{graphicsRelative}"
 
     app._imagery = {}
     for (dirFmt, ext, kind, objectType) in (
