@@ -5,7 +5,7 @@ from tf.applib.app import App
 
 
 def transform_prime(app, n, p):
-    return "'" * p if p else ""
+    return ("'" * int(p)) if p else ""
 
 
 def transform_ctype(app, n, t):
@@ -29,11 +29,11 @@ class TfApp(App):
         app.transform_prime = types.MethodType(transform_prime, app)
         app.transform_atf = types.MethodType(transform_atf, app)
 
-        atf = loadModule(*args[0:2], "atf")
+        atf = loadModule("atf", *args)
         atf.atfApi(app)
         app.atf = atf
         super().__init__(*args, silent=silent, **kwargs)
-        app.image = loadModule(*args[0:2], "image")
+        app.image = loadModule("image", *args)
 
         app.image.getImagery(app, silent, checkout=kwargs.get("checkout", ""))
 

@@ -2,11 +2,13 @@ apiVersion: 1
 dataDisplay:
   browseContentPretty: true
   browseNavLevel: 1
+  showVerseInTuple: true
 docs:
   docPage: about
   featureBase: '{docBase}/transcription{docExt}'
   featurePage: ''
 interfaceDefaults:
+  standardFeatures: true
   lineNumbers: false
   showGraphics: true
 provenanceSpec:
@@ -98,6 +100,7 @@ typeDisplay:
     graphics: true
     stretch: false
   sign:
+    base: true
     label: "{atf}"
     graphics: true
     transform:
