@@ -141,7 +141,7 @@ def caseDir(app, n, nType, cls):
     F = api.F
 
     wrap = aContext.levels[nType]["wrap"]
-    flow = "col" if F.depth.v(n) & 1 else "row"
+    flow = "ver" if F.depth.v(n) & 1 else "hor"
     cls.update(dict(children=f"children {flow} {wrap}"))
 
 

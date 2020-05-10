@@ -29,7 +29,7 @@ typeDisplay:
     - comment
     - quad
     - sign
-    flow: row
+    flow: hor
     label: '{number}{prime}'
     level: 2
     lineNumber: srcLnNum
@@ -53,7 +53,7 @@ typeDisplay:
     - comment
     - line
     childrenPlain: false
-    flow: col
+    flow: ver
     level: 3
     label: '{number}{prime}'
     lineNumber: srcLnNum
@@ -70,7 +70,7 @@ typeDisplay:
     - comment
     childrenPlain: false
     featuresBare: identifier fragment
-    flow: row
+    flow: hor
     label: '{type}'
     lineNumber: srcLnNum
     stretch: false
@@ -83,7 +83,7 @@ typeDisplay:
     - comment
     - quad
     - sign
-    flow: row
+    flow: hor
     label: '{number}'
     level: 2
     lineNumber: srcLnNum
@@ -112,7 +112,7 @@ typeDisplay:
     childrenPlain: false
     condense: true
     featuresBare: name period excavation
-    flow: col
+    flow: ver
     lineNumber: srcLnNum
     stretch: false
     wrap: false
