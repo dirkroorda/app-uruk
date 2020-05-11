@@ -21,7 +21,7 @@ provenanceSpec:
   version: '1.0'
   webBase: https://cdli.ucla.edu
   webHint: to CDLI main page for this tablet
-  webUrl: /search/search_results.php?SearchMode=Text&ObjectID=<1>
+  webUrl: '{webBase}/search/search_results.php?SearchMode=Text&ObjectID=<1>'
 typeDisplay:
   case:
     children:
