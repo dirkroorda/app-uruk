@@ -1,7 +1,7 @@
 import types
-from tf.applib.helpers import dh
-from tf.applib.find import loadModule
-from tf.applib.app import App
+from tf.advanced.helpers import dh
+from tf.advanced.find import loadModule
+from tf.advanced.app import App
 
 
 def transform_prime(app, n, p):
@@ -41,9 +41,7 @@ class TfApp(App):
 
     def reinit(app):
         aContext = app.context
-        atf = app.atf
         api = app.api
-        F = api.F
         E = api.E
 
         def getOp(ch):
@@ -54,21 +52,15 @@ class TfApp(App):
                 result = f'<div class="op">{op}</div>'
             return result
 
-        aContext.childrenCustom.clear()
-        aContext.childrenCustom.update(
-            line=((lambda x: not F.terminal.v(x)), E.sub.f, False),
-            case=((lambda x: not F.terminal.v(x)), E.sub.f, False),
-            quad=((lambda x: True), E.sub.f, False),
-        )
         aContext.afterChild.clear()
         aContext.afterChild.update(quad=getOp)
         aContext.plainCustom.clear()
         aContext.plainCustom.update(
-            sign=atf.plainAtfType, quad=atf.plainAtfType, cluster=atf.plainAtfType,
+            sign=app.plainAtfType, quad=app.plainAtfType, cluster=app.plainAtfType,
         )
         aContext.prettyCustom.clear()
         aContext.prettyCustom.update(
-            case=caseDir, cluster=clusterBoundaries, comments=commentsCls
+            case=app.caseDir, cluster=app.clusterBoundaries, comments=app.commentsCls
         )
 
     def cdli(app, n, linkText=None, asString=False):
@@ -83,7 +75,7 @@ class TfApp(App):
 
     # PRETTY HELPERS
 
-    def getGraphics(app, n, nType, outer):
+    def getGraphics(app, isPretty, n, nType, outer):
         api = app.api
         F = api.F
         E = api.E
@@ -105,7 +97,7 @@ class TfApp(App):
                 warning=False,
             )
             if theGraphics:
-                result = f"<div>{theGraphics}</div>"
+                result = f"<div>{theGraphics}</div>" if isPretty else f" {theGraphics}"
 
         return result
 
@@ -133,23 +125,3 @@ class TfApp(App):
 
     def imagery(app, objectType, kind):
         return set(app._imagery.get(objectType, {}).get(kind, {}))
-
-
-def caseDir(app, n, nType, cls):
-    aContext = app.context
-    api = app.api
-    F = api.F
-
-    wrap = aContext.levels[nType]["wrap"]
-    flow = "ver" if F.depth.v(n) & 1 else "hor"
-    cls.update(dict(children=f"children {flow} {wrap}"))
-
-
-def clusterBoundaries(app, n, nType, cls):
-    lbl = cls.pop("label")
-    cls.update(dict(labelb=f"{lbl} {nType}b", labele=f"{lbl} {nType}e"))
-    cls["container"] += f" {nType}"
-
-
-def commentsCls(app, n, nType, cls):
-    cls["container"] += f" {nType}"

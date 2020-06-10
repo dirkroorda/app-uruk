@@ -1,4 +1,4 @@
-apiVersion: 2
+apiVersion: 3
 dataDisplay:
   browseContentPretty: true
   browseNavLevel: 1
@@ -43,8 +43,8 @@ typeDisplay:
     - cluster
     - quad
     - sign
-    childrenPlain: false
     label: '{type}'
+    template: '{type}'
     stretch: false
     transform:
       type: ctype
@@ -52,8 +52,8 @@ typeDisplay:
     children:
     - comment
     - line
-    childrenPlain: false
     flow: ver
+    isBig: true
     level: 3
     label: '{number}{prime}'
     lineNumber: srcLnNum
@@ -68,9 +68,9 @@ typeDisplay:
     children:
     - column
     - comment
-    childrenPlain: false
     featuresBare: identifier fragment
     flow: hor
+    isBig: true
     label: '{type}'
     lineNumber: srcLnNum
     stretch: false
@@ -96,7 +96,6 @@ typeDisplay:
     - cluster
     - quad
     - sign
-    childrenPlain: false
     graphics: true
     stretch: false
   sign:
@@ -109,10 +108,10 @@ typeDisplay:
     children:
     - comment
     - face
-    childrenPlain: false
     condense: true
     featuresBare: name period excavation
     flow: ver
+    isBig: true
     lineNumber: srcLnNum
     stretch: false
     wrap: false

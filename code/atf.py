@@ -1,6 +1,6 @@
 import types
-from tf.applib.helpers import dm
-from tf.applib.highlight import getHlAtt
+from tf.advanced.helpers import dm
+from tf.advanced.highlight import getHlAtt
 
 FLAGS = (
     ("damage", "#"),
@@ -31,36 +31,39 @@ def atfApi(app):
     app.nodeFromCase = types.MethodType(nodeFromCase, app)
     app.caseFromNode = types.MethodType(caseFromNode, app)
     app.casesByLevel = types.MethodType(casesByLevel, app)
+    app.plainAtfType = types.MethodType(plainAtfType, app)
+    app.caseDir = types.MethodType(caseDir, app)
+    app.clusterBoundaries = types.MethodType(clusterBoundaries, app)
+    app.commentsCls = types.MethodType(commentsCls, app)
 
 
-def plainAtfType(app, dContext, g, r, n, outer, done=set()):
-    nType = r.nType
-    isSign = nType == "sign"
-    isQuad = nType == "quad"
-    text = (
-        app.atfFromSign(n, dContext=dContext, done=done) + " "
-        if isSign
-        else app.atfFromQuad(n, dContext=dContext, done=done) + " "
-        if isQuad
-        else app.atfFromCluster(n, dContext=dContext, done=done)
-    )
-    theLineart = ""
-    if dContext.showGraphics:
-        if isSign or isQuad:
-            width = "2em" if isSign else "4em"
-            height = "4em" if isSign else "6em"
-            theLineart = app.image.getImages(
-                app,
-                n,
-                kind="lineart",
-                width=width,
-                height=height,
-                _asString=True,
-                withCaption=False,
-                warning=False,
-            )
-            theLineart = f" {theLineart}"
-    return f"{text}{theLineart}" if theLineart else text
+def plainAtfType(app, dContext, chunk, nType, outer):
+    (n, (b, e)) = chunk
+    signs = set(range(b, e + 1))
+    nTypeUF = nType[0].upper() + nType[1:]
+    method = getattr(app, f"atfFrom{nTypeUF}")
+    done = set()
+    return method(n, dContext=dContext, done=done, signs=signs) + " "
+
+
+def caseDir(app, n, nType, cls):
+    aContext = app.context
+    api = app.api
+    F = api.F
+
+    wrap = aContext.levels[nType]["wrap"]
+    flow = "ver" if F.depth.v(n) & 1 else "hor"
+    cls.update(dict(children=f"children {flow} {wrap}"))
+
+
+def clusterBoundaries(app, n, nType, cls):
+    lbl = cls.pop("label")
+    cls.update(dict(labelb=f"{lbl} {nType}b", labele=f"{lbl} {nType}e"))
+    cls["container"] += f" {nType}"
+
+
+def commentsCls(app, n, nType, cls):
+    cls["container"] += f" {nType}"
 
 
 def getSource(app, node, nodeType=None, lineNumbers=False):
@@ -85,7 +88,12 @@ def getSource(app, node, nodeType=None, lineNumbers=False):
     return sourceLines
 
 
-def atfFromSign(app, n, flags=False, dContext=None, outerCls="", done=set()):
+def atfFromSign(
+    app, n, flags=False, dContext=None, outerCls="", done=set(), signs=None
+):
+    if signs is not None and n not in signs:
+        return ""
+
     F = app.api.F
     Fs = app.api.Fs
 
@@ -136,12 +144,17 @@ def atfFromSign(app, n, flags=False, dContext=None, outerCls="", done=set()):
 
 
 def atfFromQuad(
-    app, n, flags=False, outer=True, dContext=None, outerCls="", done=set()
+    app, n, flags=False, outer=True, dContext=None, outerCls="", done=set(), signs=None
 ):
     api = app.api
     E = api.E
     F = api.F
     Fs = api.Fs
+
+    if signs is not None:
+        nSlots = set(E.oslots.s(n))
+        if not (nSlots & signs):
+            return ""
 
     if F.otype.v(n) != "quad":
         result = "«no quad»"
@@ -169,10 +182,16 @@ def atfFromQuad(
                 dContext=dContext,
                 outerCls=outerCls,
                 done=done,
+                signs=signs,
             )
             if childType == "quad"
             else app.atfFromSign(
-                child, flags=flags, dContext=dContext, outerCls=outerCls, done=done,
+                child,
+                flags=flags,
+                dContext=dContext,
+                outerCls=outerCls,
+                done=done,
+                signs=signs,
             )
         )
         result += f"{thisResult}{op}"
@@ -216,13 +235,22 @@ def atfFromQuad(
     return _deliver(app, n, result, dContext, outerCls, done)
 
 
-def atfFromOuterQuad(app, n, flags=False, dContext=None, outerCls="", done=set()):
+def atfFromOuterQuad(
+    app, n, flags=False, dContext=None, outerCls="", done=set(), signs=None
+):
     api = app.api
     F = api.F
+    E = api.E
+
+    if signs is not None:
+        nSlots = set(E.oslots.s(n))
+        if not (nSlots & signs):
+            return ""
+
     nodeType = F.otype.v(n)
     if nodeType == "sign":
         result = app.atfFromSign(
-            n, flags=flags, dContext=dContext, outerCls=outerCls, done=done
+            n, flags=flags, dContext=dContext, outerCls=outerCls, done=done, signs=signs
         )
     elif nodeType == "quad":
         result = app.atfFromQuad(
@@ -232,6 +260,7 @@ def atfFromOuterQuad(app, n, flags=False, dContext=None, outerCls="", done=set()
             dContext=dContext,
             outerCls=outerCls,
             done=done,
+            signs=signs,
         )
     else:
         result = "«no outer quad»"
@@ -239,12 +268,16 @@ def atfFromOuterQuad(app, n, flags=False, dContext=None, outerCls="", done=set()
     return _deliver(app, n, result, dContext, outerCls, done)
 
 
-def atfFromCluster(app, n, dContext=None, outerCls="", done=set()):
+def atfFromCluster(app, n, dContext=None, outerCls="", done=set(), signs=None):
     api = app.api
     F = api.F
     E = api.E
     N = api.N
 
+    if signs is not None:
+        nSlots = set(E.oslots.s(n))
+        if not (nSlots & signs):
+            return ""
     if F.otype.v(n) != "cluster":
         result = "«no cluster»"
         return _deliver(app, n, result, dContext, outerCls)
@@ -263,15 +296,25 @@ def atfFromCluster(app, n, dContext=None, outerCls="", done=set()):
 
         thisResult = (
             app.atfFromCluster(
-                child, dContext=dContext, outerCls=outerCls, done=done,
+                child, dContext=dContext, outerCls=outerCls, done=done, signs=signs
             )
             if childType == "cluster"
             else app.atfFromQuad(
-                child, flags=True, dContext=dContext, outerCls=outerCls, done=done,
+                child,
+                flags=True,
+                dContext=dContext,
+                outerCls=outerCls,
+                done=done,
+                signs=signs,
             )
             if childType == "quad"
             else app.atfFromSign(
-                child, flags=True, dContext=dContext, outerCls=outerCls, done=done,
+                child,
+                flags=True,
+                dContext=dContext,
+                outerCls=outerCls,
+                done=done,
+                signs=signs,
             )
             if childType == "sign"
             else None
@@ -287,7 +330,9 @@ def atfFromCluster(app, n, dContext=None, outerCls="", done=set()):
 def _deliver(app, n, result, dContext, outerCls, done):
     if dContext is None:
         return result
-    (hlCls, hlStyle) = getHlAtt(app, n, dContext.highlights, dContext.baseTypes, True)
+    (hlCls, hlStyle) = getHlAtt(app, n, dContext.highlights, dContext.baseTypes)
+    hlCls = hlCls[True]
+    hlStyle = hlStyle[True]
     clses = f"plain{outerCls} {hlCls}"
     done.add(n)
     return f'<span class="{clses}" {hlStyle}>{result}</span>'

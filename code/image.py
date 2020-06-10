@@ -4,9 +4,9 @@ from glob import glob
 from shutil import copyfile
 
 from tf.core.helpers import console
-from tf.applib.helpers import dh
-from tf.applib.links import outLink
-from tf.applib.repo import checkoutRepo
+from tf.advanced.helpers import dh
+from tf.advanced.links import outLink
+from tf.advanced.repo import checkoutRepo
 
 LOCAL_IMAGE_DIR = "cdli-imagery"
 
@@ -268,6 +268,7 @@ def getImagery(app, silent, checkout=""):
     graphicsRelative = aContext.graphicsRelative
 
     (imageRelease, imageCommit, imageLocal, imageBase, imageDir) = checkoutRepo(
+        app._browse,
         org=org,
         repo=repo,
         folder=graphicsRelative,
@@ -313,7 +314,7 @@ def getImagery(app, silent, checkout=""):
             images.setdefault(identifier, {})[key] = filePath
         app._imagery.setdefault(objectType, {})[kind] = images
         if not silent:
-            console(f"Found {len(images)} {objectType} {kind}s")
+            dh(f"Found {len(images)} {objectType} {kind}s<br>")
 
 
 def wrapLink(piece, objectType, kind, identifier, pos="bottom", caption=None):
