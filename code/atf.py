@@ -32,6 +32,7 @@ def atfApi(app):
     app.caseFromNode = types.MethodType(caseFromNode, app)
     app.casesByLevel = types.MethodType(casesByLevel, app)
     app.plainAtfType = types.MethodType(plainAtfType, app)
+    app.getOp = types.MethodType(getOp, app)
     app.caseDir = types.MethodType(caseDir, app)
     app.clusterBoundaries = types.MethodType(clusterBoundaries, app)
     app.commentsCls = types.MethodType(commentsCls, app)
@@ -54,6 +55,17 @@ def caseDir(app, n, nType, cls):
     wrap = aContext.levels[nType]["wrap"]
     flow = "ver" if F.depth.v(n) & 1 else "hor"
     cls.update(dict(children=f"children {flow} {wrap}"))
+
+
+def getOp(app, ch):
+    api = app.api
+    E = api.E
+    result = ""
+    nextChildren = E.op.f(ch)
+    if nextChildren:
+        op = nextChildren[0][1]
+        result = f'<div class="op">{op}</div>'
+    return result
 
 
 def clusterBoundaries(app, n, nType, cls):
@@ -162,7 +174,7 @@ def atfFromQuad(
 
     children = E.sub.f(n)
     if not children or len(children) < 2:
-        result = f"«quad with less than two sub-quads»"
+        result = "«quad with less than two sub-quads»"
         return _deliver(app, n, result, dContext, outerCls)
 
     result = ""

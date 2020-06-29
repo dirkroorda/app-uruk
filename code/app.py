@@ -40,26 +40,16 @@ class TfApp(App):
         app.reinit()
 
     def reinit(app):
-        aContext = app.context
-        api = app.api
-        E = api.E
+        customMethods = app.customMethods
 
-        def getOp(ch):
-            result = ""
-            nextChildren = E.op.f(ch)
-            if nextChildren:
-                op = nextChildren[0][1]
-                result = f'<div class="op">{op}</div>'
-            return result
-
-        aContext.afterChild.clear()
-        aContext.afterChild.update(quad=getOp)
-        aContext.plainCustom.clear()
-        aContext.plainCustom.update(
+        customMethods.afterChild.clear()
+        customMethods.afterChild.update(quad=app.getOp)
+        customMethods.plainCustom.clear()
+        customMethods.plainCustom.update(
             sign=app.plainAtfType, quad=app.plainAtfType, cluster=app.plainAtfType,
         )
-        aContext.prettyCustom.clear()
-        aContext.prettyCustom.update(
+        customMethods.prettyCustom.clear()
+        customMethods.prettyCustom.update(
             case=app.caseDir, cluster=app.clusterBoundaries, comments=app.commentsCls
         )
 
