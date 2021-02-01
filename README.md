@@ -14,7 +14,7 @@ for working with the
 Get started with the
 [tutorial](https://nbviewer.jupyter.org/github/annotation/tutorials/blob/master/uruk/start.ipynb).
 
-It offers this [API](https://annotation.github.io/text-fabric/Api/App/).
+It offers this [API](https://annotation.github.io/text-fabric/tf/cheatsheet.html).
 
 This app also contains interfaces to deal with
 [ATF](http://oracc.museum.upenn.edu/doc/help/editinginatf/primer/inlinetutorial/index.html)
