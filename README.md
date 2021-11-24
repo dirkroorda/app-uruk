@@ -3,8 +3,8 @@
 # Uruk
 
 [![SWH](https://archive.softwareheritage.org/badge/origin/https://github.com/annotation/app-uruk/)](https://archive.softwareheritage.org/browse/origin/https://github.com/annotation/app-uruk/)
-
 [![DOI](https://zenodo.org/badge/161639327.svg)](https://zenodo.org/badge/latestdoi/161639327)
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 
 This is a
 [Text-Fabric](https://github.com/annotation/text-fabric) app
@@ -32,3 +32,8 @@ See also
 ![shot](images/shot.png)
 
 ![jup](images/jup.png)
+
+# Author
+
+[Dirk Roorda](https://github.com/dirkroorda)
+
